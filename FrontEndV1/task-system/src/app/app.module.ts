@@ -6,12 +6,18 @@ import { AppComponent } from './app.component';
 import { LoginPageComponent } from './login-page/login-page.component';
 import { LoginServiceService } from './login-service.service';
 import { HttpClientModule } from '@angular/common/http';
-import { FormsModule} from '@angular/forms'
+import { FormsModule} from '@angular/forms';
+import { HomePageComponent } from './home-page/home-page.component';
+import { CrudTaskComponent } from './crud-task/crud-task.component';
+import { GetStatsReportComponent } from './get-stats-report/get-stats-report.component'
 
 @NgModule({
   declarations: [
     AppComponent,
-    LoginPageComponent
+    LoginPageComponent,
+    HomePageComponent,
+    CrudTaskComponent,
+    GetStatsReportComponent
   ],
   imports: [
     BrowserModule,
