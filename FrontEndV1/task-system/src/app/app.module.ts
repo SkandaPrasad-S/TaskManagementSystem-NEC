@@ -9,7 +9,9 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule} from '@angular/forms';
 import { HomePageComponent } from './home-page/home-page.component';
 import { CrudTaskComponent } from './crud-task/crud-task.component';
-import { GetStatsReportComponent } from './get-stats-report/get-stats-report.component'
+import { GetStatsReportComponent } from './get-stats-report/get-stats-report.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
+import { MaterialModule } from './material/material.module';
 
 @NgModule({
   declarations: [
@@ -23,7 +25,9 @@ import { GetStatsReportComponent } from './get-stats-report/get-stats-report.com
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    BrowserAnimationsModule,
+    MaterialModule
   ],
   providers: [LoginServiceService],
   bootstrap: [AppComponent]
