@@ -1,46 +1,70 @@
-var mongo=require("mongodb")
+var mongo=require("mongodb").MongoClient
 var express=require("express")
 var body_parser=require("body-parser")
-
-
+const cors=require("cors")
+mongo.Promise=global.Promise;
 var app=express();
 app.use(body_parser.json())
-app.listen(3001);
-console.log("listening at 3001");
+app.use(cors({origin:'http://localhost:4200'}));
+app.listen(3000);
+
+var conn;
+var flag;
 const url = 'mongodb://127.0.0.1:27017';
     options = {
     useNewUrlParser: true
     };
 
-app.post("/login",function(req,res){
+ 
+
+mongo.connect(url,options,function(err,db){
+    conn=db;
+    
+    if(!err){
+        flag=true;
+    }
+    else{
+        flag=false;
+    }
+})
+
+app.post("/login", function(req,res){
+    if(flag==false){
+        mongo.connect(url,options,function(err,db){
+        conn=db;
+        })
+    }
     
     var body=req.body;
-    mongo.connect(url, options).then(function (ok) {
+        dbName="tms"
+        return conn.db('tms').collection('employee').find({$and:[{employeeId:body.employeeId},{password:body.password}]}).toArray()
+        .then(function (dbs) {
         
-       db1 = ok;
-       dbName = 'tms';
-        return db1.db(dbName).collection('employee').find({$and:[{employeeId:body.employeeId},{password:body.password}]}).toArray();
-
-    })
-    .then(function (dbs) {
         
-        res.status(200).send(dbs);
+        if(!dbs.length>0){
+            console.log("here")
+            res.send({"result":"login unsuccessful"});
+            res.send();
+        }
         
-        db1.close();
+        res.status(200).send(dbs[0]);
+        
     
     }).catch(err=>{
-        res.status(400).send("login unsuccessful");
+        res.status(400).send({"result":"login unsuccessful"});
     })
 
 })
 
 app.post("/createORcopy/:id",function(req,res){
-    
+    if(flag==false){
+        mongo.connect(url,options,function(err,db){
+        conn=db;
+        })
+    }
     var id=req.params.id;
     var body=req.body;
-    mongo.connect(url, options).then(function (ok) {
-        
-       db1 = ok;
+    
        dbName = 'tms';
     
     var stdate=new Date(body.startDate)
@@ -48,82 +72,58 @@ app.post("/createORcopy/:id",function(req,res){
     sdate=new Date(new Date(stdate).toISOString())
     edate=new Date(new Date(endate).toISOString())
        
-    return db1.db(dbName).collection('tasks').insertOne({taskId:body.taskId,type:body.type,developerId:id,startDate:sdate,endDate:edate,remainingWork:body.remainingWork,total:body.total,comments:body.comments,status:"active",project:body.project,sprint:body.sprint},function(err,result){
+    return conn.db(dbName).collection('tasks').insertOne({taskId:body.taskId,type:body.type,developerId:id,startDate:sdate,endDate:edate,remainingWork:body.remainingWork,total:body.total,comments:body.comments,status:"active",project:body.project,sprint:body.sprint},function(err,result){
         if (err) throw err;
         
-    })
+
 
     })
     .then(function (dbs) {
-        res.status(200).send("insert successful");
+        res.status(200).send({"result":"insert successful"});
         
-        db1.close();
+        
     
     }).catch(err=>{
         console.log(err);
-        res.status(400).send("insert unsuccessful");
+        res.status(400).send({"result":"insert unsuccessful"});
     })
 
 })
 
 app.get("/taskDetails/:taskId",function(req,res){
-    
+    if(flag==false){
+        mongo.connect(url,options,function(err,db){
+        conn=db;
+        })
+    }
     var id=parseInt(req.params.taskId);
     
-    mongo.connect(url, options).then(function (ok) {
-        
-       db1 = ok;
+    
        dbName = 'tms';
     
     
        
-    return db1.db(dbName).collection('tasks').find({taskId:id}).toArray();
+    return conn.db(dbName).collection('tasks').find({taskId:id}).toArray()
 
-    })
+    
     .then(function (dbs) {
+        delete(dbs[0]._id)
         res.status(200).send(dbs[0]);
-        db1.close();
+      
     
     }).catch(err=>{
         console.log(err);
-        res.status(400).send("details retrieval unsuccessful");
-    })
-
-})
-
-app.get("/allTasks/:dId",function(req,res){
-    
-    var did=req.params.dId;
-    
-    // var body=req.body
-    // var fromDate=body.fromDate
-    // var toDate=body.toDate
-    // fDate=new Date(new Date(fromDate).toISOString())
-    // tDate=new Date(new Date(toDate).toISOString())
-    
-    mongo.connect(url, options).then(function (ok) {
-        
-       db1 = ok;
-       dbName = 'tms';
-    
-    
-       
-    return db1.db(dbName).collection('tasks').find({developerId:did}).sort({endDate:-1}).toArray();
-
-    })
-    .then(function (dbs) {
-        res.status(200).send(dbs);
-        db1.close();
-    
-    }).catch(err=>{
-        console.log(err);
-        res.status(400).send(" all tasks retrieval unsuccessful");
+        res.status(400).send({"result":"details retrieval unsuccessful"});
     })
 
 })
 
 app.post("/allTasksByDate/:dId",function(req,res){
-    
+    if(flag==false){
+        mongo.connect(url,options,function(err,db){
+        conn=db;
+        })
+    }
     var did=req.params.dId;
     
     var body=req.body
@@ -132,157 +132,233 @@ app.post("/allTasksByDate/:dId",function(req,res){
     fDate=new Date(new Date(fromDate).toISOString())
     tDate=new Date(new Date(toDate).toISOString())
     
-    mongo.connect(url, options).then(function (ok) {
-        
-       db1 = ok;
+   
        dbName = 'tms';
     
     
        
-    return db1.db(dbName).collection('tasks').find({$and:[{startDate:{$gte:fDate}},{endDate:{$lte:tDate}},{developerId:did}]}).sort({startDate:-1}).toArray();
+    return conn.db(dbName).collection('tasks').find({$and:[{startDate:{$gte:fDate}},{endDate:{$lte:tDate}},{developerId:did}]}).sort({startDate:-1}).toArray()
 
-    })
+    
     .then(function (dbs) {
         res.status(200).send(dbs);
-        db1.close();
+       
     
     }).catch(err=>{
         console.log(err);
-        res.status(400).send("tasks retrieval unsuccessful");
+        res.status(400).send({"result":"tasks retrieval unsuccessful"});
     })
 
 })
 
 app.post("/allTasksByProject/:dId",function(req,res){
-    
+    if(flag==false){
+        mongo.connect(url,options,function(err,db){
+        conn=db;
+        })
+    }
     var did=req.params.dId;
     var body=req.body;
-    mongo.connect(url, options).then(function (ok) {
-        
-       db1 = ok;
+    
        dbName = 'tms';
     
     
        
-    return db1.db(dbName).collection('tasks').find({$and:[{developerId:did},{project:body.project}]}).sort({project:1}).toArray();
+    return conn.db(dbName).collection('tasks').find({$and:[{developerId:did},{project:body.project}]}).sort({project:1}).toArray()
 
-    })
+    
     .then(function (dbs) {
         res.status(200).send(dbs);
-        db1.close();
+       
     
     }).catch(err=>{
         console.log(err);
-        res.status(400).send("tasks retrieval unsuccessful");
+        res.status(400).send({"result":"tasks retrieval unsuccessful"});
     })
 
 })
 
 app.post("/allTasksByDeveloper",function(req,res){
     
-   
+    if(flag==false){
+        mongo.connect(url,options,function(err,db){
+        conn=db;
+        })
+    }
     var body=req.body;
-    mongo.connect(url, options).then(function (ok) {
-        
-       db1 = ok;
+   
        dbName = 'tms';
     
     
        
-    return db1.db(dbName).collection('tasks').find({developerId:body.developerId}).sort({project:1}).toArray();
+    return conn.db(dbName).collection('tasks').find({developerId:body.developerId}).sort({project:1}).toArray()
 
-    })
+    
     .then(function (dbs) {
         res.status(200).send(dbs);
-        db1.close();
+        
     
     }).catch(err=>{
         console.log(err);
-        res.status(400).send("tasks retrieval unsuccessful");
+        res.status(400).send({"result":"tasks retrieval unsuccessful"});
     })
 
 })
 
 app.post("/update/:id",function(req,res){
-    
+    if(flag==false){
+        mongo.connect(url,options,function(err,db){
+        conn=db;
+        })
+    }
     var id=req.params.id;
     var body=req.body;
-    mongo.connect(url, options).then(function (ok) {
-        
-       db1 = ok;
+   
        dbName = 'tms';
     
     var sdate=new Date(body.startDate)
     var edate=new Date(body.endDate)
        
-    return db1.db(dbName).collection('tasks').updateOne({taskId:body.taskId},{$set:{type:body.type,developerId:id,startDate:sdate,endDate:edate,remainingWork:body.remainingWork,total:body.total,status:"active",project:body.project,sprint:body.sprint}},function(err,result){
+    return conn.db(dbName).collection('tasks').updateOne({taskId:body.taskId},{$set:{type:body.type,developerId:id,startDate:sdate,endDate:edate,remainingWork:body.remainingWork,total:body.total,status:"active",project:body.project,sprint:body.sprint}},function(err,result){
         if (err) throw err;
         
-    })
+    
 
     })
     .then(function (dbs) {
-        res.status(200).send("update successful");
+        res.status(200).send({"result":"update successful"});
         
-        db1.close();
+      
     
     }).catch(err=>{
         console.log(err);
-        res.status(400).send("update unsuccessful");
+        res.status(400).send({"result":"update unsuccessful"});
     })
 
 })
 
 app.post("/complete",function(req,res){
     
+    if(flag==false){
+        mongo.connect(url,options,function(err,db){
+        conn=db;
+        })
+    }
    
     var body=req.body;
-    mongo.connect(url, options).then(function (ok) {
-        
-       db1 = ok;
-       dbName = 'tms';
-       
-    return db1.db(dbName).collection('tasks').updateOne({taskId:body.taskId},{$set:{status:"completed"}},function(err,result){
+    
+    return conn.db(dbName).collection('tasks').updateOne({taskId:body.taskId},{$set:{status:"completed"}},function(err,result){
         if (err) throw err;
         
     })
 
-    })
+    
     .then(function (dbs) {
-        res.status(200).send("complete successful");
+        res.status(200).send({"result":"complete successful"});
         
-        db1.close();
+       
     
     }).catch(err=>{
         console.log(err);
-        res.status(400).send("complete unsuccessful");
+        res.status(400).send({"result":"complete unsuccessful"});
     })
 
 })
 
 app.post("/delete",function(req,res){
-    
+    if(flag==false){
+        mongo.connect(url,options,function(err,db){
+        conn=db;
+        })
+    }
    
     var body=req.body;
-    mongo.connect(url, options).then(function (ok) {
-        
-       db1 = ok;
+   
        dbName = 'tms';
        
-    return db1.db(dbName).collection('tasks').updateOne({taskId:body.taskId},{$set:{status:"inactive"}},function(err,result){
+    return conn.db(dbName).collection('tasks').updateOne({taskId:body.taskId},{$set:{status:"inactive"}},function(err,result){
         if (err) throw err;
         
     })
 
-    })
+    
     .then(function (dbs) {
-        res.status(200).send("delete successful");
+        res.status(200).send({"result":"delete successful"});
         
-        db1.close();
     
     }).catch(err=>{
         console.log(err);
-        res.status(400).send("delete unsuccessful");
+        res.status(400).send({"result":"delete unsuccessful"});
+    })
+
+})
+
+
+
+app.get("/allTasksDefault/:dId",function(req,res){
+    if(flag==false){
+        mongo.connect(url,options,function(err,db){
+        conn=db;
+        })
+    }
+    var did=req.params.dId;
+    
+    
+    
+    
+       dbName = 'tms';
+    
+    
+       
+    return conn.db(dbName).collection('tasks').find({developerId:did}).sort({endDate:-1}).toArray()
+
+    
+    .then(function (dbs) {
+        res.status(200).send(dbs);
+    
+    }).catch(err=>{
+        console.log(err);
+        res.status(400).send({"result":"tasks retrieval unsuccessful"});
+    })
+
+})
+
+app.get("/logOut",function(req,res){
+
+    conn.close();
+    res.send({"result":"logged Out"});
+})
+
+app.post("/takeLeave/:Did",function(req,res){
+    
+    if(flag==false){
+        mongo.connect(url,options,function(err,db){
+        conn=db;
+        })
+    }
+    var did=req.params.Did;
+    var body=req.body;
+    
+       dbName = 'tms';
+    
+    var stdate=body.fromDate
+    fromDate=new Date(new Date(stdate).toISOString())
+    if(body.toDate!==null){
+        var endate=body.toDate
+        toDate=new Date(new Date(endate).toISOString())
+    }
+    else
+       var toDate=null;
+    
+   
+   
+    return conn.db(dbName).collection('tasks').updateOne({developerId:did},{$set:{fromDate:fromDate,toDate:toDate}
+    }).then(function (dbs) {
+        res.status(200).send({"result":"update successful"});
+    
+    }).catch(err=>{
+        console.log(err);
+        res.status(400).send({"result":"update unsuccessful"});
     })
 
 })
