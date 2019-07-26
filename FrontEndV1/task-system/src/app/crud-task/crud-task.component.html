@@ -1,24 +1,24 @@
-<form class="task-form">
+<form class="task-form" #createTask="ngForm" (ngSubmit)="makeNewTask(createTask)">
     <div class="container">
         <h1><b>{{pagetitle}}</b></h1>
     </div>
     <mat-form-field class="task-width">
-        <input name="taskid" matInput placeholder="Task ID" [readonly]="statuscontentedit" value="{{taskid}}" required>
+        <input name="taskId" matInput placeholder="Task ID" [readonly]="statuscontentedit" value="{{taskid}}" required
+            ngModel>
     </mat-form-field>
 
     <table class="task-width" cellspacing="0">
         <tr>
             <td>
                 <mat-form-field class="task-width">
-                    <input name="typeOf" matInput placeholder="Type" [readonly]="statuscontentedit" value="{{type}}"
-                        required>
+                    <input name="type" matInput placeholder="Type" [readonly]="statuscontentedit" value="{{type}}"ngModel required>
                 </mat-form-field>
             </td>
         </tr>
         <tr>
             <td>
                 <mat-form-field class="task-width">
-                    <input name="devname" matInput value="{{devname}}" [readonly]="statuscontentedit"
+                    <input name="devName" matInput value="{{devname}}" [readonly]="statuscontentedit"
                         placeholder="Developer Name" required>
                 </mat-form-field>
             </td>
@@ -29,14 +29,14 @@
         <tr>
             <td>
                 <mat-form-field class="task-width">
-                    <input name="startdate" matInput value="{{sdate}}" [readonly]="statuscontentedit"
-                        placeholder="Start Date" type="date" required>
+                    <input name="startDate" matInput value="{{sdate}}" [readonly]="statuscontentedit"
+                        placeholder="Start Date" type="date" ngModel required>
                 </mat-form-field>
             </td>
             <td>
                 <mat-form-field class="task-width">
-                    <input name="lastdate" matInput value="{{edate}}" [readonly]="statuscontentedit"
-                        placeholder="Last Date" type="date" required>
+                    <input name="endDate" matInput value="{{edate}}" [readonly]="statuscontentedit"
+                        placeholder="Last Date" type="date" ngModel required>
                 </mat-form-field>
             </td>
         </tr>
@@ -47,43 +47,44 @@
             <td>
                 <mat-form-field class="task-width">
                     <input name="sprint" matInput value="{{sprint}}" [readonly]="statuscontentedit" placeholder="Sprint"
-                        required>
+                        ngModel required>
                 </mat-form-field>
             </td>
             <td>
                 <mat-form-field class="task-width">
-                    <input name="projectname" matInput value="{{pname}}" [readonly]="statuscontentedit"
-                        placeholder="Project Name" required>
+                    <input name="project" matInput value="{{pname}}" [readonly]="statuscontentedit"
+                        placeholder="Project Name" ngModel required>
                 </mat-form-field>
             </td>
         </tr>
         <tr>
             <td>
                 <mat-form-field class="task-width">
-                    <input matInput name="remhours" value="{{remhours}}" [readonly]="statuscontentedit" maxlength="2"
-                        placeholder="Remaining hours" type="number">
+                    <input matInput name="remainingWork" value="{{remhours}}" [readonly]="statuscontentedit"
+                        maxlength="2" placeholder="Remaining hours" type="number" ngModel>
                 </mat-form-field>
             </td>
 
             <td>
                 <mat-form-field class="task-width">
-                    <input type="number" matInput value="{{totalhrs}}" [readonly]="statuscontentedit" name="totalhrs"
-                        placeholder="Total" required type="number">
+                    <input type="number" matInput value="{{totalhrs}}" [readonly]="statuscontentedit" name="total"
+                        placeholder="Total" required type="number" ngModel>
                 </mat-form-field>
             </td>
         </tr>
         <tr>
             <mat-form-field class="comments-width" appearance="outline">
                 <textarea name="comments" value="{{comments}}" [readonly]="statuscontentedit" matInput
-                    placeholder="Comments"></textarea>
+                    placeholder="Comments" ngModel></textarea>
             </mat-form-field>
         </tr>
     </table>
     <!-- <button color:green mat-raised-button (click)="">{{buttonaction1}}</button> -->
-    <input id="inp" type="submit" value="{{buttonaction1}}" >
-    </form>
+    <button id="btn" mat-raised-button type="submit">{{buttonaction1}}</button>
 
-    <div *ngIf="createflag=='display'">
-        <br> <button color:green mat-raised-button>{{buttonaction2}}</button><br><br>
-        <button color:green mat-raised-button>{{buttonaction3}}</button>
-    </div>
+
+<div *ngIf="createflag=='display'">
+    <br> <button id="btn" mat-raised-button>{{buttonaction2}}</button><br><br>
+    <button id="btn" mat-raised-button>{{buttonaction3}}</button>
+</div>
+</form>

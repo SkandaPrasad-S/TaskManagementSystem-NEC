@@ -6,6 +6,7 @@ const material1=[MatButtonModule,
 MatFormFieldModule,
 MatInputModule,
 MatIconModule,
+
 ]
 @NgModule({
   imports: [material1],

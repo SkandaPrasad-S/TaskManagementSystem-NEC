@@ -27,7 +27,7 @@ import { MaterialModule } from './material/material.module';
     HttpClientModule,
     FormsModule,
     BrowserAnimationsModule,
-    MaterialModule
+    MaterialModule,
   ],
   providers: [LoginServiceService],
   bootstrap: [AppComponent]
