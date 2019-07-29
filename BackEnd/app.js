@@ -30,7 +30,7 @@ var MongoClient = Promise.promisifyAll(require("mongodb")).MongoClient
 var app = express();
 app.use(body_parser.json())
 app.use(cors({ origin: 'http://localhost:4200' }));
-app.listen(3000);
+app.listen(3001);
 
 
 var conn;
@@ -307,6 +307,7 @@ app.post("/allTasksByProject/:dId", function (req, res) {
 
 
     var did = req.params.dId;
+    var body=req.body;
 
     getData(did).then(function (array) {
         array.sort(function (a, b) {
@@ -314,7 +315,7 @@ app.post("/allTasksByProject/:dId", function (req, res) {
         })
         var output=[];
         for(ele of array){
-            if(ele.statusName==="active")
+            if(ele.statusName==="active" && ele.projectName===body.projectName)
                 output.push(ele)
         }
         if (output.length !== 0)
@@ -328,7 +329,7 @@ app.post("/allTasksByProject/:dId", function (req, res) {
 app.post("/allTasksByDeveloper", function (req, res) {
 
     var body = req.body;
-    var did = body.developerId;
+    var did = body.employeeId;
 
     getData(did).then(function (array) {
         array.sort(function (a, b) {
@@ -492,21 +493,21 @@ app.get("/logOut", function (req, res) {
 
 app.post("/takeLeave/:Did", function (req, res) {
 
-
+   
     var did = req.params.Did;
+    console.log(did)
     var body = req.body;
     var stdate = body.fromDate;
     fromDate = new Date(new Date(stdate).toISOString())
-    if (body.toDate !== null) {
+    if (body.toDate !== undefined) {
         var endate = body.toDate
         toDate = new Date(new Date(endate).toISOString())
     }
     else
-        var toDate = null;
+        var toDate =null;
+   
 
-
-
-    return conn.collection('attendance').updateOne({ employeeId: did, fromDate: fromDate, toDate: toDate, comment:body.comment })
+    return conn.collection('attendance').insertOne({ employeeId: did, fromDate: fromDate, toDate: toDate, comment:body.comment })
 
         .then(function (dbs) {
             res.status(200).send({ "result": "update successful" });
