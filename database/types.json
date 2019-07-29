@@ -1,0 +1,2 @@
+{"_id":{"$oid":"5d3a8116504e5a1af4b53807"},"typeId":{"$numberInt":"1"},"typeName":"Debugging"}
+{"_id":{"$oid":"5d3a813bc19fa51af414380b"},"typeId":{"$numberInt":"2"},"typeName":"Debugging"}

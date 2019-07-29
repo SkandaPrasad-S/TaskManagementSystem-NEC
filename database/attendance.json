@@ -1,0 +1,3 @@
+{"_id":{"$oid":"5d3a78a0504e5a1af4b53806"},"employeeId":"nec01","fromDate":{"$date":{"$numberLong":"1564338600000"}},"toDate":{"$date":{"$numberLong":"1564338600000"}},"comment":"reason"}
+{"_id":{"$oid":"5d3a7972c19fa51af414380a"},"employeeId":"nec01","fromDate":{"$date":{"$numberLong":"1564338600000"}},"toDate":{"$date":{"$numberLong":"1564338600000"}},"comment":"reason"}
+{"_id":{"$oid":"5d3e7c4081e69d41f82d61b0"},"employeeId":"nec01","fromDate":{"$date":{"$numberLong":"1564358400000"}},"toDate":null}
