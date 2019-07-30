@@ -1,1 +1,106 @@
-<p>home-page works!</p>
+<div id="main">
+  <div id="header">
+    <div id="logo">
+      <div id="logo_text">
+        <img id="image" src="../assets/header-img.png" alt="NEC Technologies">
+      </div>
+    </div>
+    <div class="navigation">
+      <div class="button">
+        <button class="logoutText" mat-button (click)="logout()">LOGOUT</button>
+      </div>
+    </div>
+  </div>
+  <div id="site_content" style="margin-top: 0px">
+    <div style="float:left" id="sidebar_container">
+      <div class="sidebar">
+        <div class="sidebar_top"></div>
+        <div class="sidebar_item">
+          <h3>Developer Details</h3>
+          <h4>Developer ID: {{dId}}</h4>
+          <h4>Developer Name: {{dName}}</h4><br />
+          <button id="btn" mat-raised-button [matMenuTriggerFor]="menu">Take Leave</button>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item pattern (click)="myFunctionSingleDay()">Single day</button>
+            <button mat-menu-item (click)="myFunctionMultipleDays()">Multiple days</button>
+          </mat-menu>
+        </div>
+        <div class="sidebar_base"></div>
+      </div>
+      <div class="sidebar_base"></div>
+    </div>
+    <div class="content">
+      <div class="dev_table">
+        <table>
+          <tr>
+            <th>Task ID</th>
+            <th>Type ID</th>
+            <th>Task name</th>
+            <th>Task Description</th>
+            <th>Project</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Sprint</th>
+            <th>Total Work</th>
+            <th>Remaining work</th>
+          </tr>
+          <tr *ngFor="let dev of items">
+            <td><a href="">{{dev.taskId}}</a></td>
+            <td>{{dev.typeId}}</td>
+            <td>{{dev.taskName}}</td>
+            <td>{{dev.taskDescription}}</td>
+            <td>{{dev.projectName}}</td>
+            <td>{{dev.startDate}}</td>
+            <td>{{dev.endDate}}</td>
+            <td>{{dev.sprint}}</td>
+            <td>{{dev.totalWork}}</td>
+            <td>{{dev.remainingWork}}</td>
+          </tr>
+        </table>
+        <div class="buttons">
+          <button id="btn" mat-raised-button [matMenuTriggerFor]="menu2">Sorting</button>
+          <mat-menu #menu2="matMenu">
+            <button type="submit" mat-menu-item (click)="myFunctionMultipleDaysSelect()">By Date</button>
+            <button mat-menu-item (click)="myFunctionProjectSelect()">By Project</button>
+            <button *ngIf="managerView" mat-menu-item (click)="myFunctionDeveloperSelect()">By Developer</button>
+          </mat-menu>
+          <button id="btn" style="margin-left: 25%" mat-raised-button>Get Statistics</button>
+          <button id="btn" style="margin-left: 25%" mat-raised-button>Create Task</button>
+        </div>
+        <form #leave="ngForm" *ngIf="showCalendar" (ngSubmit)="takeLeave(leave)">
+          <div class="singleDate" *ngIf="singleCalendarField">
+            Date:<input matInput type="date" name="fromDate" ngModel><br>
+            Reason:<input matInput type="text" name="comment" required ngModel><br><br>
+          </div>
+          <div class="multipleDate" *ngIf="!singleCalendarField">
+            From:<input matInput type="date" name="fromDate" ngModel><br>
+            To:<input matInput class="toText" type="date" name="toDate" ngModel><br>
+            Reason:<input matInput type="text" name="comment" required ngModel><br><br>
+          </div>
+          <button id="btn" mat-raised-button type="submit">submit</button>
+          <button id="btn" mat-raised-button class="closeAll" type="submit" (click)="collapse()">Close</button>
+        </form>
+        <form #sorting="ngForm" *ngIf="showSortingCalendar" (ngSubmit)="sortingDate(sorting)">
+          From:<input type="date" matInput name="fromDate" ngModel><br>
+          To:<input class="toText" matInput type="date" name="toDate" ngModel><br><br>
+          <button id="btn" mat-raised-button type="submit">submit</button>
+          <button id="btn" mat-raised-button class="closeAll" type="submit" (click)="collapse()">Close</button>
+        </form>
+        <form #project="ngForm" *ngIf="projectInput" (ngSubmit)="sortingProject(project)">
+          <br>Enter the project name:<input matInput type="text" name="projectName" ngModel><br><br>
+          <button id="btn" mat-raised-button type="submit">Submit</button>
+          <button id="btn" mat-raised-button class="closeAll" type="submit" (click)="collapse()">Close</button>
+        </form>
+        <form #developer="ngForm" *ngIf="developerInput" (ngSubmit)="sortingDeveloper(developer)">
+          <br>Enter the developer ID:<input matInput type="text" name="employeeId" ngModel><br><br>
+          <button id="btn" mat-raised-button type="submit">Submit</button>
+          <button id="btn" mat-raised-button class="closeAll" type="submit" (click)="collapse()">Close</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div id="footer">
+    <p><a href="https://contact.nec.com/http-in.nec.com_tb_root_contact/">Contact Us</a></p>
+    <p>Copyright &copy; NEC Technologies India Private Limited 2019. All rights reserved.</p>
+  </div>
+</div>

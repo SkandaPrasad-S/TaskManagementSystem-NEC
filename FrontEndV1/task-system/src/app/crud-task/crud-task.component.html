@@ -1,6 +1,13 @@
+<div id="header">
+    <div id="logo">
+        <div id="logo_text">
+            <img id="image" src="../assets/header-img.png" alt="NEC Technologies">
+        </div>
+    </div>
+</div>
 <form class="task-form" #createTask="ngForm" (ngSubmit)="makeNewTask(createTask)">
     <div class="container">
-        <h1><b>{{pagetitle}}</b></h1>
+        <h1><b style="color: black">{{pagetitle}}</b></h1>
     </div>
     <table class="task-width" cellspacing="0">
         <tr>
@@ -26,16 +33,16 @@
                 <mat-form-field class="task-width">
                     <input name="taskName" matInput placeholder="Task Name" [readonly]="statuscontentedit"
                         value="{{type}}" ngModel required>
-                        <mat-error>Please fill this field</mat-error>
+                    <mat-error>Please fill this field</mat-error>
                 </mat-form-field>
-                
+
             </td>
 
             <td>
                 <mat-form-field class="task-width">
                     <input name="taskDescription" matInput placeholder="Description" [readonly]="statuscontentedit"
                         value="{{type}}" ngModel required>
-                        <mat-error>Please fill this field</mat-error>
+                    <mat-error>Please fill this field</mat-error>
                 </mat-form-field>
 
             </td>
@@ -44,18 +51,20 @@
             <td>
                 <mat-form-field class="task-width">
                     <input name="startDate" matInput value="{{sdate}}" [readonly]="statuscontentedit"
-                        placeholder="Start Date" type="date" #startDate="ngModel" required ngModel (change)="checkDate(startDate.value,endDate.value)">
-                        <mat-error>Please fill this field</mat-error>
+                        placeholder="Start Date" type="date" #startDate="ngModel" required ngModel
+                        (change)="checkDate(startDate.value,endDate.value)">
+                    <mat-error>Please fill this field</mat-error>
                 </mat-form-field>
             </td>
             <td>
                 <mat-form-field class="task-width">
                     <input name="endDate" matInput value="{{edate}}" [readonly]="statuscontentedit"
-                        placeholder="Last Date" type="date" #endDate="ngModel" required (change)="checkDate(startDate.value,endDate.value)" ngModel>
-                        <!-- <mat-error>Please fill this field</mat-error> -->
-                        <div *ngIf="status2==true">
+                        placeholder="Last Date" type="date" #endDate="ngModel" required
+                        (change)="checkDate(startDate.value,endDate.value)" ngModel>
+                    <mat-error>Please fill this field</mat-error>
+                    <div *ngIf="status2==true">
                         <mat-error>End date must be greater than start date</mat-error>
-                        </div>
+                    </div>
                 </mat-form-field>
             </td>
         </tr>
@@ -64,12 +73,12 @@
                 <mat-form-field class="task-width">
                     <input name="sprint" matInput value="{{sprint}}" [readonly]="statuscontentedit" placeholder="Sprint"
                         ngModel required>
-                        <mat-error>Please fill this field</mat-error>
+                    <mat-error>Please fill this field</mat-error>
                 </mat-form-field>
 
             </td>
             <td style="float: left;">
-                <mat-form-field>
+                <mat-form-field style="width:135%">
                     <mat-label>Project Name</mat-label>
                     <mat-select name="projectId" ngModel required>
                         <mat-option *ngFor="let s of projectsobj;" [value]="s.projectId">
@@ -100,7 +109,7 @@
         </tr>
         <tr style="float:left;">
             <td>
-                <mat-form-field>
+                <mat-form-field style="width: 154%">
                     <mat-label>Current status</mat-label>
                     <mat-select name="statusId" ngModel required>
                         <mat-option *ngFor="let s of statusobj" [value]="s.statusId">
@@ -118,10 +127,15 @@
             </mat-form-field>
         </tr>
     </table>
-    <!-- <button color:green mat-raised-button (click)="">{{buttonaction1}}</button> -->
+    <!-- <button color:green mat-raised-button (click)="">{{buttonaction1}}</button>  -->
     <button id="btn" mat-raised-button type="submit">{{buttonaction1}}</button>
     <!-- <div *ngIf="createflag=='display'">
         <br> <button id="btn" mat-raised-button>{{buttonaction2}}</button><br><br>
         <button id="btn" mat-raised-button>{{buttonaction3}}</button>
-    </div> -->
+     </div>  -->
+    <br><br><br>
 </form>
+<div id="footer">
+    <p><a href="https://contact.nec.com/http-in.nec.com_tb_root_contact/">Contact Us</a></p>
+    <p>Copyright &copy; NEC Technologies India Private Limited 2019. All rights reserved.</p>
+</div>
