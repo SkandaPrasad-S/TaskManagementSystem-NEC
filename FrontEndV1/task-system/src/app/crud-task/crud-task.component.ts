@@ -15,66 +15,73 @@ export class CrudTaskComponent implements OnInit {
   constructor(private createSer:CreateService){
     // this.fn=fb.group({});
   }
-  pagetitle = "Create Task";
-  taskid: number;
-  type = "";
-  devname = "";
-  sdate: string;
-  edate: string;
-  sprint = "";
-  pname = "";
-  remhours = 0;
-  totalhrs = 0;
-  comments = ""; 
+  pagetitle = "Create Task"; 
   buttonaction1 = "Create";
-  buttonaction2 = "";
-  buttonaction3 = "";
-  statuscontentedit: boolean = true;
-  createflag: string = "create";
+  statuscontentedit: boolean = false;
   items;
+  statusobj;
+  projectsobj;
+  selected="some";
+  valprojectId;
+  status2 = false;
+  
   ngOnInit(): void {
     //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
-    //Add 'implements OnInit' to the class.
-    this.Displaypage();
+    //Add 'implements OnInit' to the class
+    this.getProjectDetails();
+    this.getStatusDetails();
   }
-  Displaypage() {
-    if (this.createflag == "create") {
-      this.pagetitle = "Create Task"
-      this.type = "";
-      this.devname = "";
-      this.sdate = ""
-      this.edate = ""
-      this.sprint = "";
-      this.pname = "";
-      this.remhours = 0;
-      this.totalhrs = 0;
-      this.comments = "";
-      this.buttonaction1 = "Create";
-      this.statuscontentedit = false;
-    }
-    if (this.createflag == "display") {
-      this.pagetitle = "Task Details"
-      this.taskid = 0;
-      this.type = "Sample";
-      this.devname = "Sample";
-      this.sdate = "2019-07-23"
-      this.edate = "2019-07-24"
-      this.sprint = "Sample";
-      this.pname = "SampleProject";
-      this.remhours = 20;
-      this.totalhrs = 10;
-      this.comments = "SampleSampleSampleSampleSampleSampleSampleSampleSampleSampleSample";
-      this.buttonaction1 = "Modify";
-      this.buttonaction2 = "Copy To Create";
-      this.buttonaction3 = "Delete";
-      this.statuscontentedit = true;
-    }
-  }
-  makeNewTask(createTask:NgForm){
-    let obs=this.createSer.sendDetails(createTask.value);
+ 
+  
+  getStatusDetails(){
+    let obs=this.createSer.getStatusId()
     obs.subscribe((response)=>{
-      this.items=(response);
+      this.statusobj=response;
+      console.log(response);
+      
+    });
+  }
+
+  getProjectDetails(){
+    let obs1=this.createSer.getProjects()
+    obs1.subscribe((response)=>{
+      this.projectsobj=response;
+      console.log(response);
+      this.selected=response[0].projectName;
+      
+    });
+  }
+ 
+  makeNewTask(createTask:NgForm){
+
+    if(this.checkForm(createTask)){
+    let obs=this.createSer.sendDetails(createTask.value)
+    obs.subscribe((response)=>{
+      this.items=response;
       console.log(response);
     })
+  }
+  }
+  checkForm(createTask:NgForm){
+    if(createTask.valid && this.status2==false){
+      console.log("no error")
+      return true;
+    }
+    else
+    {
+      console.log("Error");
+      alert("Please enter proper details")
+      return false;
+    }
+  }
+  checkDate(sd,ed){
+    console.log(ed);
+    console.log(sd);
+    if(ed<sd){
+      this.status2=true;
+    }
+    else{
+    this.status2=false;
+    }
   }
 }

@@ -6,6 +6,7 @@ import {  createFormObject } from './crud-task/createmodel';
 @Injectable({
   providedIn: 'root'
 })
+
 export class CreateService {
 
   constructor(private http:HttpClient) { }
@@ -14,13 +15,16 @@ export class CreateService {
     console.log(value.taskId);
     console.log(value.startDate);
     console.log(value.endDate);
-
+    console.log(value.statusId);
     var httpOptions= new HttpHeaders({
       'Content-type':'application/json',
     });
-    return this.http.post('http://localhost:3001/createORcopy/3',value);
+    return this.http.post('http://localhost:3000/createORcopy/nec03',value);
   }
-
-
-  
+  getStatusId(){
+    return this.http.get('http://localhost:3000/getStatus')
+  }
+  getProjects(){
+    return this.http.get('http://localhost:3000/getProjects')
+  }
 }

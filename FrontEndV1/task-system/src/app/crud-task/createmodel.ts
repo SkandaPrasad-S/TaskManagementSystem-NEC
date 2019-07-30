@@ -1,15 +1,15 @@
 export class createFormObject {
     taskId: number;
-    type: string;
-    developerId: number=1;
+    typeId: number;
+    taskName:string;
+    taskDescription:string;
     startDate: string;
     endDate: string;
     remainingWork: number;
-    total: number;
+    totalWork: number;
     comments: string;
-    status: string="active";
-    project: string;
+    statusId:number;
+    projectId:number;
     sprint: string
-  
   }
   
