@@ -1,5 +1,5 @@
 <div id="main">
-  <div id="header">
+  <!-- <div id="header">
     <div id="logo">
       <div id="logo_text">
         <img id="image" src="../assets/header-img.png" alt="NEC Technologies">
@@ -10,7 +10,7 @@
         <button class="logoutText" mat-button (click)="logout()">LOGOUT</button>
       </div>
     </div>
-  </div>
+  </div> -->
   <div id="site_content" style="margin-top: 0px">
     <div style="float:left" id="sidebar_container">
       <div class="sidebar">
@@ -65,7 +65,8 @@
             <button *ngIf="managerView" mat-menu-item (click)="myFunctionDeveloperSelect()">By Developer</button>
           </mat-menu>
           <button id="btn" style="margin-left: 25%" mat-raised-button>Get Statistics</button>
-          <button id="btn" style="margin-left: 25%" mat-raised-button>Create Task</button>
+          <button id="btn" style="margin-left: 25%" routerLink="/app-crud-task" mat-raised-button>Create Task</button>
+          
         </div>
         <form #leave="ngForm" *ngIf="showCalendar" (ngSubmit)="takeLeave(leave)">
           <div class="singleDate" *ngIf="singleCalendarField">

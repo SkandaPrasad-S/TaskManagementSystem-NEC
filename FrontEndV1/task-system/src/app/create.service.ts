@@ -16,7 +16,7 @@ export class CreateService {
     console.log(value.startDate);
     console.log(value.endDate);
     console.log(value.statusId);
-    var httpOptions= new HttpHeaders({
+    const httpOptions= new HttpHeaders({
       'Content-type':'application/json',
     });
     return this.http.post('http://localhost:3000/createORcopy/nec03',value);

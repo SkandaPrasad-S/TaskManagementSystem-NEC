@@ -12,6 +12,7 @@ import { CrudTaskComponent } from './crud-task/crud-task.component';
 import { GetStatsReportComponent } from './get-stats-report/get-stats-report.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { MaterialModule } from './material/material.module';
+import { HeaderComponent } from './header/header.component';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { MaterialModule } from './material/material.module';
     LoginPageComponent,
     HomePageComponent,
     CrudTaskComponent,
-    GetStatsReportComponent
+    GetStatsReportComponent,
+    HeaderComponent
   ],
   imports: [
     BrowserModule,
