@@ -1,0 +1,1 @@
+{"_id":{"$oid":"5d416e325fd92b464cd9d8f1"},"employeeId":"nec01","taskId":{"$numberInt":"1"},"date":{"$date":{"$numberLong":"1564569138591"}},"workedHours":{"$numberInt":"2"}}
