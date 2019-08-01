@@ -62,7 +62,7 @@
                         placeholder="Last Date" type="date" #endDate="ngModel" required
                         (change)="checkDate(startDate.value,endDate.value)" ngModel>
                     <mat-error>Please fill this field</mat-error>
-                    <div *ngIf="status2==true">
+                    <div *ngIf="dateStatus==true">
                         <mat-error>End date must be greater than start date</mat-error>
                     </div>
                 </mat-form-field>
@@ -81,7 +81,7 @@
                 <mat-form-field style="width:135%">
                     <mat-label>Project Name</mat-label>
                     <mat-select name="projectId" ngModel required>
-                        <mat-option *ngFor="let s of projectsobj;" [value]="s.projectId">
+                        <mat-option *ngFor="let s of projectsObjectect;" [value]="s.projectId">
                             {{s.projectName}}
                         </mat-option>
                     </mat-select>
@@ -112,7 +112,7 @@
                 <mat-form-field style="width: 154%">
                     <mat-label>Current status</mat-label>
                     <mat-select name="statusId" ngModel required>
-                        <mat-option *ngFor="let s of statusobj" [value]="s.statusId">
+                        <mat-option *ngFor="let s of statusObject" [value]="s.statusId">
                             {{s.statusName}}
                         </mat-option>
                     </mat-select>
