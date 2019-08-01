@@ -51,7 +51,6 @@ td{
 #btnSubmit:hover{
     background-color: rgb(44, 152, 44);
 }
-/* }
 #inp{
     background-color: green;min-width: 40%;
     max-width:100%;
@@ -64,7 +63,7 @@ td{
 }
 #inp:hover{
     background-color: black;
-} */
+}
 
 #btn{
     background-color:lightseagreen;

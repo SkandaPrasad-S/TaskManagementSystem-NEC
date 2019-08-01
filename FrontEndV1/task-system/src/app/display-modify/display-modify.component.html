@@ -1,0 +1,198 @@
+<!-- " -->
+<form class="task-form" #modifyTask="ngForm" (ngSubmit)="updateTask(modifyTask)">
+    <div class="container">
+        <h1><b style="color: black" *ngIf="!viewFlag">Display Details</b></h1>
+        <h1 *ngIf="viewFlag" style="color: black">Update Details</h1>
+    </div>
+    <table class="task-width" cellspacing="0" style="color:black;">
+        <tr>
+            <td>
+                <mat-form-field class="task-width" *ngIf="!viewFlag">
+                    <input name="taskId" matInput placeholder="Task ID" [readonly]="true" pattern="[0-9]+"
+                        value="{{displayObj.taskId}}" required>
+                    <mat-error>Please enter a valid Task ID</mat-error>
+                </mat-form-field>
+                <mat-form-field class="task-width" *ngIf="viewFlag">
+                    <input name="taskId" matInput placeholder="Task ID" [readonly]="true" pattern="[0-9]+"
+                        [(ngModel)]="displayObj.taskId" required>
+                    <mat-error>Please enter a valid Task ID</mat-error>
+                </mat-form-field>
+            </td>
+            <td>
+                <mat-form-field class="task-width" *ngIf="!viewFlag">
+                    <input name="typeId" matInput placeholder="TypeID" [readonly]="statuscontentedit"
+                        value="{{displayObj.typeId}}" pattern="[0-9]+" required>
+                    <mat-error>Please enter a valid Type ID</mat-error>
+                </mat-form-field>
+                <div *ngIf="viewFlag">
+                    <mat-form-field class="task-width">
+                        <input name="typeId" matInput placeholder="TypeID" [(ngModel)]="displayObj.typeId"
+                            pattern="[0-9]+" required>
+                        <mat-error>Please enter a valid Type ID</mat-error>
+                    </mat-form-field>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <mat-form-field class="task-width" *ngIf="!viewFlag">
+                    <input name="taskName" matInput placeholder="Task Name" [readonly]="statuscontentedit"
+                        value="{{displayObj.taskName}}" required>
+                    <mat-error>Please fill this field</mat-error>
+                </mat-form-field>
+                <mat-form-field class="task-width" *ngIf="viewFlag">
+                    <input name="taskName" matInput placeholder="Task Name" [readonly]="statuscontentedit"
+                        [(ngModel)]="displayObj.taskName" required>
+                    <mat-error>Please fill this field</mat-error>
+                </mat-form-field>
+            </td>
+            <td>
+                <mat-form-field class="task-width" *ngIf="!viewFlag">
+                    <input name="taskDescription" matInput placeholder="Description" [readonly]="statuscontentedit"
+                        value="{{displayObj.taskDescription}}" required>
+                    <mat-error>Please fill this field</mat-error>
+                </mat-form-field>
+                <mat-form-field class="task-width" *ngIf="viewFlag">
+                    <input name="taskDescription" matInput placeholder="Description" [readonly]="statuscontentedit"
+                        [(ngModel)]="displayObj.taskDescription" required>
+                    <mat-error>Please fill this field</mat-error>
+                </mat-form-field>
+
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <mat-form-field class="task-width" *ngIf="!viewFlag">
+                    <input name="startDate" matInput value="{{storeStartDate}}" [readonly]="statuscontentedit"
+                        placeholder="Start Date" type="date" #startDate="" required
+                        (change)="checkDate(startDate.value,endDate.value)">
+                    <mat-error>Please fill this field</mat-error>
+                </mat-form-field>
+                <mat-form-field class="task-width" *ngIf="viewFlag">
+                    <input name="startDate" matInput [(ngModel)]="storeStartDate" [readonly]="statuscontentedit"
+                        placeholder="Start Date" type="date" #startDate="" required
+                        (change)="checkDate(startDate.value,endDate.value)">
+                    <mat-error>Please fill this field</mat-error>
+                </mat-form-field>
+            </td>
+            <td>
+                <mat-form-field class="task-width" *ngIf="!viewFlag">
+                    <input name="endDate" matInput value="{{storeEndDate}}" [readonly]="statuscontentedit"
+                        placeholder="Last Date" type="date" #endDate="" required
+                        (change)="checkDate(startDate.value,endDate.value)">
+                    <mat-error>Please fill this field</mat-error>
+                    <div *ngIf="status2==true">
+                        <mat-error>End date must be greater than start date</mat-error>
+                    </div>
+                </mat-form-field>
+                <mat-form-field class="task-width" *ngIf="viewFlag">
+                    <input name="endDate" matInput [(ngModel)]="storeEndDate" [readonly]="statuscontentedit"
+                        placeholder="Last Date" type="date" #endDate="" required
+                        (change)="checkDate(startDate.value,endDate.value)">
+                    <mat-error>Please fill this field</mat-error>
+                    <div *ngIf="status2==true">
+                        <mat-error>End date must be greater than start date</mat-error>
+                    </div>
+                </mat-form-field>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <mat-form-field class="task-width" *ngIf="!viewFlag">
+                    <input name="sprint" matInput value="{{displayObj.sprint}}" [readonly]="statuscontentedit"
+                        placeholder="Sprint" required>
+                    <mat-error>Please fill this field</mat-error>
+                </mat-form-field>
+                <mat-form-field class="task-width" *ngIf="viewFlag">
+                    <input name="sprint" matInput [(ngModel)]="displayObj.sprint" [readonly]="statuscontentedit"
+                        placeholder="Sprint" required>
+                    <mat-error>Please fill this field</mat-error>
+                </mat-form-field>
+
+            </td>
+            <td>
+                <mat-form-field style="width:100%" *ngIf="viewFlag" >
+                    <mat-label>Project Name</mat-label>
+                    <mat-select name="projectId" ngModel required>
+                        <mat-option *ngFor="let s of projectsobj;" [value]="s.projectId">
+                            {{s.projectName}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error>Please fill this field</mat-error>
+                </mat-form-field>
+                <mat-form-field style="float:left;width:100%" *ngIf="!viewFlag" >
+                    <input name="projectId" matInput [(ngModel)]="displayObj.projectName" [readonly]="true"
+                        placeholder="Project Name" required>
+                </mat-form-field>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <mat-form-field class="task-width" *ngIf="!viewFlag">
+                    <input type="number" matInput value="{{displayObj.remainingWork}}" [readonly]="statuscontentedit"
+                        name="remainingWork" placeholder="Remaining hours" type="number" pattern="[0-9]+">
+                    <mat-error>Please enter a number</mat-error>
+                </mat-form-field>
+                <mat-form-field class="task-width" *ngIf="viewFlag">
+                    <input type="number" matInput [(ngModel)]="displayObj.remainingWork" [readonly]="statuscontentedit"
+                        name="remainingWork" placeholder="Remaining hours" type="number" pattern="[0-9]+">
+                    <mat-error>Please enter a number</mat-error>
+                </mat-form-field>
+            </td>
+
+            <td>
+                <mat-form-field class="task-width" *ngIf="!viewFlag">
+                    <input type="number" matInput value="{{displayObj.totalWork}}" [readonly]="statuscontentedit"
+                        name="totalWork" placeholder="Total" required type="number" pattern="[0-9]+">
+                    <mat-error>Please enter a number</mat-error>
+                    <mat-error>Please fill this field</mat-error>
+                </mat-form-field>
+                <mat-form-field class="task-width" *ngIf="viewFlag">
+                    <input type="number" matInput [(ngModel)]="displayObj.totalWork" [readonly]="statuscontentedit"
+                        name="totalWork" placeholder="Total" required type="number" pattern="[0-9]+">
+                    <mat-error>Please enter a number</mat-error>
+                </mat-form-field>
+            </td>
+        </tr>
+        <tr style="float:left;">
+            <td>
+                <mat-form-field style="width: 154%" *ngIf="viewFlag">
+                    <mat-label>Current status</mat-label>
+                    <mat-select name="statusId" ngModel required>
+                        <mat-option *ngFor="let s of statusobj" [value]="s.statusId">
+                            {{s.statusName}}
+                        </mat-option>
+                    </mat-select>
+                    <mat-error>Please fill this field</mat-error>
+                </mat-form-field>
+                <mat-form-field style="float:left;width:100%" *ngIf="!viewFlag">
+                    <input name="statusId" matInput value="{{displayObj.statusName}}" [readonly]="statuscontentedit"
+                        placeholder="Status Name" required>
+                </mat-form-field>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <mat-form-field class="comments-width" appearance="outline" *ngIf="!viewFlag">
+                    <textarea name="comments" value="{{displayObj.comments}}" [readonly]="statuscontentedit" matInput
+                        placeholder="Comments"></textarea>
+                </mat-form-field>
+                <mat-form-field class="comments-width" appearance="outline" *ngIf="viewFlag">
+                    <textarea name="comments" [(ngModel)]="displayObj.comments" [readonly]="statuscontentedit" matInput
+                        placeholder="Comments"></textarea>
+                </mat-form-field>
+            </td>
+        </tr>
+    </table>
+    <button color:green mat-raised-button id="btn" (click)="gotomodify()" *ngIf="!viewFlag">{{buttonaction1}}</button>
+    <button id="btn" mat-raised-button type="submit" *ngIf="viewFlag">{{buttonaction1}}</button>
+    <!-- <button id="btn" mat-raised-button type="submit">{{buttonaction1}}</button> -->
+    <!-- <div *ngIf="viewFlag=='display'">
+        <br> <button id="btn" mat-raised-button>{{buttonaction2}}</button><br><br>
+        <button id="btn" mat-raised-button>{{buttonaction3}}</button>
+    </div> -->
+</form>
+<div id="footer">
+    <p><a href="https://contact.nec.com/http-in.nec.com_tb_root_contact/">Contact Us</a></p>
+    <p>Copyright &copy; NEC Technologies India Private Limited 2019. All rights reserved.</p>
+</div>

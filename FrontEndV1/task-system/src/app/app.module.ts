@@ -13,6 +13,9 @@ import { GetStatsReportComponent } from './get-stats-report/get-stats-report.com
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { MaterialModule } from './material/material.module';
 import { HeaderComponent } from './header/header.component';
+import { DisplayModifyComponent } from './display-modify/display-modify.component';
+import { ModifyService } from './modify.service';
+import { CreateService } from './create.service';
 
 @NgModule({
   declarations: [
@@ -21,7 +24,8 @@ import { HeaderComponent } from './header/header.component';
     HomePageComponent,
     CrudTaskComponent,
     GetStatsReportComponent,
-    HeaderComponent
+    HeaderComponent,
+    DisplayModifyComponent
   ],
   imports: [
     BrowserModule,
@@ -31,7 +35,7 @@ import { HeaderComponent } from './header/header.component';
     BrowserAnimationsModule,
     MaterialModule,
   ],
-  providers: [LoginServiceService],
+  providers: [LoginServiceService,ModifyService,CreateService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

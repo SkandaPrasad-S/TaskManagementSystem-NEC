@@ -30,7 +30,7 @@ var MongoClient = Promise.promisifyAll(require("mongodb")).MongoClient
 var app = express();
 app.use(body_parser.json())
 app.use(cors({ origin: 'http://localhost:4200' }));
-app.listen(3001);
+app.listen(3000);
 
 
 var conn;
@@ -242,7 +242,6 @@ app.get("/taskDetails/:taskId", function (req, res) {
 
         return result;
     };
-
     //Step 3: make the call
     callMyPromise(id).then(function (array) {
 
@@ -260,7 +259,7 @@ app.post("/allTasks/:dId", function (req, res) {
     var did = req.params.dId;
 
     getData(did).then(function (array) {
-
+        console.log(array)
         array.sort(function (a, b) {
             return a.endDate - b.endDate;
         })
@@ -344,11 +343,10 @@ app.post("/allTasksByDeveloper", function (req, res) {
 
 })
 
-app.post("/update/:id", function (req, res) {
+app.put("/update/:id", function (req, res) {
 
-    var id = req.params.id;
+    var id = parseInt(req.params.id);
     var body = req.body;
-
     dbName = 'tms';
 
     var sdate = new Date(body.startDate)

@@ -2,11 +2,13 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { CrudTaskComponent } from './crud-task/crud-task.component';
 import { HomePageComponent } from './home-page/home-page.component';
+import { DisplayModifyComponent } from './display-modify/display-modify.component';
 
 
 const routes: Routes = [
-  {path:"app-crud-task",component:CrudTaskComponent},
-  {path:"app-home-page",component:HomePageComponent},
+  {path:"createTask",component:CrudTaskComponent},
+  {path:"home",component:HomePageComponent},
+  {path:"display/:taskId",component:DisplayModifyComponent}
 ];
 
 @NgModule({

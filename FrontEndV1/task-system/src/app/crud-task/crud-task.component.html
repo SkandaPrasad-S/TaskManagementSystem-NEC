@@ -13,7 +13,7 @@
         <tr>
             <td>
                 <mat-form-field class="task-width">
-                    <input name="taskId" matInput placeholder="Task ID" [readonly]="statuscontentedit" pattern="[0-9]+"
+                    <input name="taskId" matInput placeholder="Task ID"  pattern="[0-9]+"
                         value="{{taskid}}" required ngModel>
                     <mat-error>Please enter a valid Task ID</mat-error>
                 </mat-form-field>
@@ -21,7 +21,7 @@
             </td>
             <td>
                 <mat-form-field class="task-width">
-                    <input name="typeId" matInput placeholder="TypeID" [readonly]="statuscontentedit" value="{{type}}"
+                    <input name="typeId" matInput placeholder="TypeID"  value="{{type}}"
                         pattern="[0-9]+" ngModel required>
                     <mat-error>Please enter a valid Type ID</mat-error>
                 </mat-form-field>
@@ -31,7 +31,7 @@
         <tr>
             <td>
                 <mat-form-field class="task-width">
-                    <input name="taskName" matInput placeholder="Task Name" [readonly]="statuscontentedit"
+                    <input name="taskName" matInput placeholder="Task Name" 
                         value="{{type}}" ngModel required>
                     <mat-error>Please fill this field</mat-error>
                 </mat-form-field>
@@ -40,7 +40,7 @@
 
             <td>
                 <mat-form-field class="task-width">
-                    <input name="taskDescription" matInput placeholder="Description" [readonly]="statuscontentedit"
+                    <input name="taskDescription" matInput placeholder="Description" 
                         value="{{type}}" ngModel required>
                     <mat-error>Please fill this field</mat-error>
                 </mat-form-field>
@@ -50,7 +50,7 @@
         <tr>
             <td>
                 <mat-form-field class="task-width">
-                    <input name="startDate" matInput value="{{sdate}}" [readonly]="statuscontentedit"
+                    <input name="startDate" matInput value="{{sdate}}" 
                         placeholder="Start Date" type="date" #startDate="ngModel" required ngModel
                         (change)="checkDate(startDate.value,endDate.value)">
                     <mat-error>Please fill this field</mat-error>
@@ -58,7 +58,7 @@
             </td>
             <td>
                 <mat-form-field class="task-width">
-                    <input name="endDate" matInput value="{{edate}}" [readonly]="statuscontentedit"
+                    <input name="endDate" matInput value="{{edate}}" 
                         placeholder="Last Date" type="date" #endDate="ngModel" required
                         (change)="checkDate(startDate.value,endDate.value)" ngModel>
                     <mat-error>Please fill this field</mat-error>
@@ -71,7 +71,7 @@
         <tr>
             <td>
                 <mat-form-field class="task-width">
-                    <input name="sprint" matInput value="{{sprint}}" [readonly]="statuscontentedit" placeholder="Sprint"
+                    <input name="sprint" matInput value="{{sprint}}"  placeholder="Sprint"
                         ngModel required>
                     <mat-error>Please fill this field</mat-error>
                 </mat-form-field>
@@ -92,7 +92,7 @@
         <tr>
             <td>
                 <mat-form-field class="task-width">
-                    <input type="number" matInput value="{{remhours}}" [readonly]="statuscontentedit"
+                    <input type="number" matInput value="{{remhours}}" 
                         name="remainingWork" placeholder="Remaining hours" type="number" ngModel pattern="[0-9]+">
                     <mat-error>Please enter a number</mat-error>
                 </mat-form-field>
@@ -100,7 +100,7 @@
 
             <td>
                 <mat-form-field class="task-width">
-                    <input type="number" matInput value="{{totalhrs}}" [readonly]="statuscontentedit" name="totalWork"
+                    <input type="number" matInput value="{{totalhrs}}"  name="totalWork"
                         placeholder="Total" required type="number" ngModel pattern="[0-9]+">
                     <mat-error>Please enter a number</mat-error>
                     <mat-error>Please fill this field</mat-error>
@@ -122,7 +122,7 @@
         </tr>
         <tr>
             <mat-form-field class="comments-width" appearance="outline">
-                <textarea name="comments" value="{{comments}}" [readonly]="statuscontentedit" matInput
+                <textarea name="comments" value="{{comments}}"  matInput
                     placeholder="Comments" ngModel></textarea>
             </mat-form-field>
         </tr>

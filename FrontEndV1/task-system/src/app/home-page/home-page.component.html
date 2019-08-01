@@ -45,7 +45,7 @@
             <th>Remaining work</th>
           </tr>
           <tr *ngFor="let dev of items">
-            <td><a href="">{{dev.taskId}}</a></td>
+            <td><a routerLink="/display/{{dev.taskId}}">{{dev.taskId}}</a></td>
             <td>{{dev.typeId}}</td>
             <td>{{dev.taskName}}</td>
             <td>{{dev.taskDescription}}</td>
@@ -65,7 +65,7 @@
             <button *ngIf="managerView" mat-menu-item (click)="myFunctionDeveloperSelect()">By Developer</button>
           </mat-menu>
           <button id="btn" style="margin-left: 25%" mat-raised-button>Get Statistics</button>
-          <button id="btn" style="margin-left: 25%" routerLink="/app-crud-task" mat-raised-button>Create Task</button>
+          <button id="btn" style="margin-left: 25%" routerLink="/createTask" mat-raised-button>Create Task</button>
           
         </div>
         <form #leave="ngForm" *ngIf="showCalendar" (ngSubmit)="takeLeave(leave)">

@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { TasklistService } from '../tasklist.service';
 import { NgForm } from '@angular/forms';
+import { ModifyService } from '../modify.service';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-home-page',
   templateUrl: './home-page.component.html',
@@ -12,8 +14,7 @@ export class HomePageComponent implements OnInit {
   singleCalendarField: boolean = false;
   showSortingCalendar: boolean = false;
   projectInput: boolean = false;
-  dId = "nec01";
-  mId = "1234";
+  dId = "nec03";
   dName;
   startDate:string;
   endDate:string;
@@ -22,7 +23,7 @@ export class HomePageComponent implements OnInit {
   developerInput: boolean = false;
   result;
 
-  constructor(private taskService: TasklistService) {
+  constructor(private taskService: TasklistService,private modifyService:ModifyService, private router:Router) {
   }
 
   firstDisplay() {
