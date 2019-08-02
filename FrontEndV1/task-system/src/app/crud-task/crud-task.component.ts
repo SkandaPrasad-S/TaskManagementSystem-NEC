@@ -17,13 +17,11 @@ export class CrudTaskComponent implements OnInit {
   }
   pagetitle = "Create Task"; 
   buttonaction1 = "Create";
-  statuscontentedit: boolean = false;
+  statusContentEdit: boolean = false;
   items;
-  statusobj;
-  projectsobj;
-  selected="some";
-  valprojectId;
-  status2 = false;
+  statusObject;
+  projectsObject;
+  dateStatus = false;
   
   ngOnInit(): void {
     //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
@@ -36,7 +34,7 @@ export class CrudTaskComponent implements OnInit {
   getStatusDetails(){
     let obs=this.createSer.getStatusId()
     obs.subscribe((response)=>{
-      this.statusobj=response;
+      this.statusObject=response;
       console.log(response);
       
     });
@@ -45,9 +43,8 @@ export class CrudTaskComponent implements OnInit {
   getProjectDetails(){
     let obs1=this.createSer.getProjects()
     obs1.subscribe((response)=>{
-      this.projectsobj=response;
+      this.projectsObject=response;
       console.log(response);
-      this.selected=response[0].projectName;
       
     });
   }
@@ -63,7 +60,7 @@ export class CrudTaskComponent implements OnInit {
   }
   }
   checkForm(createTask:NgForm){
-    if(createTask.valid && this.status2==false){
+    if(createTask.valid && this.dateStatus==false){
       console.log("no error")
       return true;
     }
@@ -74,14 +71,12 @@ export class CrudTaskComponent implements OnInit {
       return false;
     }
   }
-  checkDate(sd,ed){
-    console.log(ed);
-    console.log(sd);
-    if(ed<sd){
-      this.status2=true;
+  checkDate(startdate,enddate){
+    if(enddate<startdate){
+      this.dateStatus=true;
     }
     else{
-    this.status2=false;
+    this.dateStatus=false;
     }
   }
 }

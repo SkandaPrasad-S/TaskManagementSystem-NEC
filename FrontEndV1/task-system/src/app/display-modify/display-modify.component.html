@@ -7,13 +7,13 @@
     <table class="task-width" cellspacing="0" style="color:black;">
         <tr>
             <td>
-                <mat-form-field class="task-width" *ngIf="!viewFlag">
+                <mat-form-field class="task-width" *ngIf="!viewFlag && !createFlag">
                     <input name="taskId" matInput placeholder="Task ID" [readonly]="true" pattern="[0-9]+"
                         value="{{displayObj.taskId}}" required>
                     <mat-error>Please enter a valid Task ID</mat-error>
                 </mat-form-field>
-                <mat-form-field class="task-width" *ngIf="viewFlag">
-                    <input name="taskId" matInput placeholder="Task ID" [readonly]="true" pattern="[0-9]+"
+                <mat-form-field class="task-width" *ngIf="viewFlag && createFlag">
+                    <input name="taskId" matInput placeholder="Task ID" [readonly]="statuscontentedit" pattern="[0-9]+"
                         [(ngModel)]="displayObj.taskId" required>
                     <mat-error>Please enter a valid Task ID</mat-error>
                 </mat-form-field>
@@ -114,7 +114,7 @@
                 <mat-form-field style="width:100%" *ngIf="viewFlag" >
                     <mat-label>Project Name</mat-label>
                     <mat-select name="projectId" ngModel required>
-                        <mat-option *ngFor="let s of projectsobj;" [value]="s.projectId">
+                        <mat-option *ngFor="let s of projectsObj;" [value]="s.projectId">
                             {{s.projectName}}
                         </mat-option>
                     </mat-select>
@@ -159,7 +159,7 @@
                 <mat-form-field style="width: 154%" *ngIf="viewFlag">
                     <mat-label>Current status</mat-label>
                     <mat-select name="statusId" ngModel required>
-                        <mat-option *ngFor="let s of statusobj" [value]="s.statusId">
+                        <mat-option *ngFor="let s of statusObj" [value]="s.statusId">
                             {{s.statusName}}
                         </mat-option>
                     </mat-select>
@@ -184,8 +184,11 @@
             </td>
         </tr>
     </table>
-    <button color:green mat-raised-button id="btn" (click)="gotomodify()" *ngIf="!viewFlag">{{buttonaction1}}</button>
+    <button color:green mat-raised-button id="btn" (click)="gotomodify()" *ngIf="!viewFlag">{{buttonaction1}}</button> <br><br>
     <button id="btn" mat-raised-button type="submit" *ngIf="viewFlag">{{buttonaction1}}</button>
+    <button color:green mat-raised-button id="btn" (click)="gotocreate()" *ngIf="!viewFlag">{{buttonaction2}}</button>
+    <!-- <button id="btn" mat-raised-button type="submit" *ngIf="viewFlag">{{buttonaction2}}</button> -->
+
     <!-- <button id="btn" mat-raised-button type="submit">{{buttonaction1}}</button> -->
     <!-- <div *ngIf="viewFlag=='display'">
         <br> <button id="btn" mat-raised-button>{{buttonaction2}}</button><br><br>

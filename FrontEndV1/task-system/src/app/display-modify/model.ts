@@ -17,3 +17,18 @@ export class modifyObject {
     typeId: number;
     typeName: string;
 }
+export class displayObject{
+  taskIdFromURL;
+  viewFlag=false;
+  createFlag=false;
+  statuscontentedit=true;
+  displayObj:any={};
+  storeStartDate:String;
+  storeEndDate:String;
+  buttonaction1="Modify";
+  buttonaction2="Copy and Create";
+  statusobj;
+  projectsobj;
+  dateStatus=false;
+  responseFromModify;
+}
