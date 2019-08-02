@@ -1,4 +1,4 @@
-// contents{
+﻿// contents{
 //     login API :52
 //     getType API:75
 //     getStatus API:93
@@ -60,6 +60,7 @@ MongoClient.connect(url, options, function (err, client) {
     var ws1 = wb.addWorksheet('week1', options)
     var ws2 = wb.addWorksheet('week2', options)
     var ws3 = wb.addWorksheet('week3', options)
+    var ws4 = wb.addWorksheet('Work Allocation Summary', options)
 
     app.post("/login", function (req, res) {
 
@@ -340,7 +341,7 @@ MongoClient.connect(url, options, function (err, client) {
     app.post("/allTasksByDeveloper", function (req, res) {
 
         var body = req.body;
-        var did = body.developerId;
+        var did = body.employeeId;
 
         getData(did).then(function (array) {
             array.sort(function (a, b) {
@@ -407,7 +408,7 @@ MongoClient.connect(url, options, function (err, client) {
         }
         else
             var toDate = fromDate;
-            console.log(toDate);
+        console.log(toDate);
 
 
 
@@ -428,13 +429,13 @@ MongoClient.connect(url, options, function (err, client) {
 
         var eid = req.params.did;
         var body = req.body;
-        
-        updaateDate = new Date(new Date(body.date).toISOString()) 
+
+        updaateDate = new Date(new Date(body.date).toISOString())
         updateWorkingHours(eid, body.taskId).then(function (remaining) {
             updateHours = remaining.remainingWork - body.workedHours
             conn
                 .collection('tasks')
-                .updateOne({ $and: [{ employeeId: eid }, { taskId: body.taskId }] }, { $set: { remainingWork: updateHours,date:updateDate } })
+                .updateOne({ $and: [{ employeeId: eid }, { taskId: body.taskId }] }, { $set: { remainingWork: updateHours, date: updateDate } })
                 .then(function (data) {
                     return conn.collection('workingHours').insertOne({ employeeId: eid, taskId: body.taskId, date: datetime, workedHours: body.workedHours })
 
@@ -454,6 +455,123 @@ MongoClient.connect(url, options, function (err, client) {
 
 
     })
+
+    app.post("/getWorkingHours/:did", (req, res) => {
+
+
+        var eid = req.params.did;
+        var body = req.body;
+
+        findDate = new Date(body.date)
+
+        console.log(findDate)
+        conn
+            .collection('tasks')
+            .find({ $and: [{ employeeId: eid },{startDate:{$lte:findDate}},{endDate:{$gte:findDate}}] }).toArray()
+            .then(function (data) {
+               res.send(data)
+            }).catch(err => {
+                console.log(err)
+            })
+
+    })
+
+
+    app.put("/updateWorkingHours/:did", (req, res) => {
+        var eid = req.params.did;
+        var body = req.body;
+        flag = false;
+        newDate = new Date(new Date(body.date).toISOString())
+
+        conn
+            .collection('workingHours')
+            .find({ $and: [{ employeeId: eid }, { taskId: body.taskId }] }).toArray(function (err, emp) {
+                if (err) throw err;
+
+                if (emp !== null) {
+
+                    for (var data of emp) {
+
+
+                        var date = new Date(data.date)
+                        date = date.toISOString().slice(0, 10);
+
+                        if (date === body.date) {
+                            return conn.collection('workingHours').updateOne({ $and: [{ employeeId: eid, taskId: body.taskId, date: data.date }] }, { $set: { workedHours: body.workedHours } })
+
+                                .then(function (dbs) {
+                                    updateDate = new Date(new Date(body.date).toISOString())
+                                    updateWorkingHours(eid, body.taskId).then(function (remaining) {
+                                        updateHours = remaining.remainingWork - body.workedHours
+                                        conn
+                                            .collection('tasks')
+                                            .updateOne({ $and: [{ employeeId: eid }, { taskId: body.taskId }] }, { $set: { remainingWork: updateHours, date: updateDate } })
+                                            .then(function (data) {
+                                            }).catch(function (err) { })
+                                    })
+                                    flag = true;
+                                    console.log("here1")
+                                    res.status(200).send({ "result": "update successful" });
+
+                                }).catch(err => {
+                                    console.log(err);
+                                    res.status(400).send({ "result": "update unsuccessful" });
+                                })
+                        }
+
+                    }
+                    if (flag === false) {
+
+                        return conn.collection('workingHours').insertOne({ employeeId: eid, taskId: body.taskId, date: newDate, workedHours: body.workedHours })
+
+                            .then(function (dbs) {
+                                updateDate = new Date(new Date(body.date).toISOString())
+                                updateWorkingHours(eid, body.taskId).then(function (remaining) {
+                                    updateHours = remaining.remainingWork - body.workedHours
+                                    conn
+                                        .collection('tasks')
+                                        .updateOne({ $and: [{ employeeId: eid }, { taskId: body.taskId }] }, { $set: { remainingWork: updateHours, date: updateDate } })
+                                        .then(function (data) {
+                                        }).catch(function (err) { })
+                                })
+                                console.log("here2")
+                                res.status(200).send({ "result": "insert successful" });
+
+                            }).catch(err => {
+                                console.log(err);
+                                res.status(400).send({ "result": "insert unsuccessful" });
+                            })
+
+                    }
+                }
+                else {
+                    return conn.collection('workingHours').insertOne({ employeeId: eid, taskId: body.taskId, date: body.date, workedHours: body.workedHours })
+
+                        .then(function (dbs) {
+                            updateDate = new Date(new Date(body.date).toISOString())
+                            updateWorkingHours(eid, body.taskId).then(function (remaining) {
+                                updateHours = remaining.remainingWork - body.workedHours
+                                conn
+                                    .collection('tasks')
+                                    .updateOne({ $and: [{ employeeId: eid }, { taskId: body.taskId }] }, { $set: { remainingWork: updateHours, date: updateDate } })
+                                    .then(function (data) {
+                                    }).catch(function (err) { })
+                            })
+                            console.log("here3")
+                            res.status(200).send({ "result": "insert successful" });
+
+                        }).catch(err => {
+                            console.log(err);
+                            res.status(400).send({ "result": "insert unsuccessful" });
+                        })
+                }
+            })
+
+
+
+    })
+
+
 
     var getRemainingHours = (eid, tid) => {
 
@@ -500,10 +618,11 @@ MongoClient.connect(url, options, function (err, client) {
         var nextlastday = new Date(nextlast);
 
 
-        getStatistics( firstday, lastday, prevfirstday, prevlastday, new Date(moment()), nextlastday).then(function (result) {
-            
+        getStatistics(firstday, lastday, prevfirstday, prevlastday, new Date(moment()), nextlastday).then(function (result) {
+
             getAllData().then(function (employeeTasks) {
-                
+
+                workAllocationSummary(result, employeeTasks, ws4)
                 weekLog(result[0].current, employeeTasks, ws1)
                 weekLog(result[0].previous, employeeTasks, ws2)
                 weekLog(result[0].next, employeeTasks, ws3)
@@ -514,7 +633,7 @@ MongoClient.connect(url, options, function (err, client) {
 
     })
     function setHead(sheet) {
-        
+
         var style = wb.createStyle({
             font: {
                 color: 'white',
@@ -523,7 +642,7 @@ MongoClient.connect(url, options, function (err, client) {
             },
             fill: {
                 type: 'pattern', // Currently only 'pattern' is implemented. Non-implemented option is 'gradient'
-                patternType: 'solid', //ยง18.18.55 ST_PatternType (Pattern Type)
+                patternType: 'solid', //§18.18.55 ST_PatternType (Pattern Type)
                 bgColor: 'blue', // HTML style hex value. defaults to black
                 fgColor: 'blue'
             },
@@ -553,18 +672,18 @@ MongoClient.connect(url, options, function (err, client) {
     }
 
     var weekLog = (logdetails, tasks, sheet) => {
-        
+
         setHead(sheet);
         var beauty = wb.createStyle({
-            font:{
-                color:'black'
+            font: {
+                color: 'black'
             },
             alignment: {
                 horizontal: 'center',
 
             }
         })
-        
+
         let row = 1;
         for (let i in logdetails) {
             row++;
@@ -584,10 +703,127 @@ MongoClient.connect(url, options, function (err, client) {
                     sheet.cell(row, ++col).string(tasks[j].projectName).style(beauty)
                     sheet.cell(row, ++col).string(tasks[j].sprint).style(beauty)
                     sheet.cell(row, ++col).string(tasks[j].comments).style(beauty)
-                    
+
                 }
             }
         }
+    }
+
+    var workAllocationSummary = (logdetails, employeeTasks, sheet) => {
+        current = logdetails[0].current;
+        previous = logdetails[0].previous;
+        next = logdetails[0].next;
+        leave = logdetails[0].attendance;
+
+        var style = wb.createStyle({
+            font: {
+                color: 'white',
+                size: '20px'
+
+            },
+            fill: {
+                type: 'pattern', // Currently only 'pattern' is implemented. Non-implemented option is 'gradient'
+                patternType: 'solid', //§18.18.55 ST_PatternType (Pattern Type)
+                bgColor: 'blue', // HTML style hex value. defaults to black
+                fgColor: 'blue'
+            },
+            alignment: {
+                horizontal: 'center',
+
+            }
+
+        })
+        sheet.column(4).setWidth(20)
+        sheet.column(5).setWidth(20)
+        sheet.column(6).setWidth(20)
+        sheet.column(9).setWidth(60)
+        sheet.column(3).setWidth(70)
+        sheet.column(2).setWidth(20)
+        sheet.cell(1, 1).string("Resource").style(style)
+        sheet.cell(1, 2).string("Project ID").style(style)
+        sheet.cell(1, 3).string("Project Name").style(style)
+        sheet.cell(1, 4).string("Previous Week").style(style)
+        sheet.cell(1, 5).string("Current Week").style(style)
+        sheet.cell(1, 6).string("Next Week").style(style)
+        sheet.cell(1, 7).string("From").style(style)
+        sheet.cell(1, 8).string("To").style(style)
+        sheet.cell(1, 9).string("Comment").style(style)
+        var beauty = wb.createStyle({
+            font: {
+                color: 'black'
+            },
+            alignment: {
+                horizontal: 'center',
+
+            }
+        })
+
+        flag = 0;
+        var eobj = [];
+        for (let emp of employeeTasks) {
+
+
+            for (let el of eobj) {
+                emp.projectId = "" + emp.projectId
+                if (el.employeeId === emp.employeeId) {
+                    flag = 1;
+                    el.projectName += " , " + emp.projectName;
+                    el.projectId += "  " + "," + " " + emp.projectId;
+                }
+                else {
+                    flag = 0;
+                }
+            }
+            if (flag === 0) {
+                eobj.push(emp)
+            }
+
+        }
+        let row = 2;
+        for (let emp of eobj) {
+            var col = 1;
+            var curSum = 0
+            for (let c of current) {
+                if (c.employeeId === emp.employeeId) {
+                    curSum = curSum + c.workedHours;
+                }
+            }
+            var prevSum = 0
+            for (let p of previous) {
+                if (p.employeeId === emp.employeeId) {
+                    prevSum = prevSum + p.workedHours;
+                }
+            }
+            var nextSum = 0
+            for (let n of next) {
+                if (n.employeeId === emp.employeeId) {
+                    nextSum = nextSum + n.remainingWork;
+                }
+            }
+            var from = ""
+            var to = ""
+            var comment = ""
+            for (let l of leave) {
+                if (l.employeeId === emp.employeeId) {
+                    from = l.fromDate.toISOString().slice(0, 10) + from;
+                    to = l.toDate.toISOString().slice(0, 10) + to;
+                    comment = comment + l.comment + "    ";
+                }
+            }
+
+            sheet.cell(row, col).string(emp.employeeId).style(beauty)
+            sheet.cell(row, ++col).string(emp.projectId).style(beauty)
+            sheet.cell(row, ++col).string(emp.projectName).style(beauty)
+            sheet.cell(row, ++col).number(prevSum).style(beauty)
+            sheet.cell(row, ++col).number(curSum).style(beauty)
+            sheet.cell(row, ++col).number(nextSum).style(beauty)
+            sheet.cell(row, ++col).string(from).style(beauty)
+            sheet.cell(row, ++col).string(to).style(beauty)
+            sheet.cell(row, ++col).string(comment).style(beauty)
+            row++;
+
+        }
+
     }
 
     var currentWeek = (firstday, lastday) => {
@@ -597,7 +833,7 @@ MongoClient.connect(url, options, function (err, client) {
                 .collection('workingHours')
                 .find({ $and: [{ date: { $lte: lastday } }, { date: { $gte: firstday } }] })
                 .toArray(function (err, data) {
-                   
+
                     err
                         ? reject(err)
                         : resolve(data);
@@ -650,16 +886,16 @@ MongoClient.connect(url, options, function (err, client) {
 
                 });
         });
-    };3
+    }; 3
 
     var getStatistics = async (firstday, lastday, prevfirstday, prevlastday, nextfirstday, nextlastday) => {
 
-        
+
         var currWeek = await (currentWeek(firstday, lastday));
         var prevWeek = await (previousWeek(prevfirstday, prevlastday));
         var nextWeek = await (comingWeek(nextfirstday, nextlastday));
         var leave = await (leaveDetails(prevfirstday, nextlastday));
-        
+
         var array = [{ "current": currWeek, "previous": prevWeek, "next": nextWeek, "attendance": leave }]
 
         return array
@@ -685,7 +921,7 @@ MongoClient.connect(url, options, function (err, client) {
                 .collection('tasks')
                 .find()
                 .toArray(function (err, data) {
-                   
+
                     err
                         ? reject(err)
                         : resolve(data);
@@ -767,10 +1003,9 @@ MongoClient.connect(url, options, function (err, client) {
             array.push(obj);
         }
 
-        
         //anything here is executed after result is resolved
+        return array
 
-        return array;
     };
 
     var getAllData = async () => {
@@ -780,7 +1015,7 @@ MongoClient.connect(url, options, function (err, client) {
         var presult = [];
         var array = [];
         var result = await (getAllTask());
-        
+
 
         for (let i in result) {
             var data1 = await (getStatus(result[i]));
@@ -800,7 +1035,7 @@ MongoClient.connect(url, options, function (err, client) {
             array.push(obj);
         }
 
-        
+
         //anything here is executed after result is resolved
 
         return array;
