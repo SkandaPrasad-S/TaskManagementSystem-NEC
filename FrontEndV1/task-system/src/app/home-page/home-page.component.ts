@@ -1,39 +1,27 @@
 import { Component, OnInit } from '@angular/core';
 import { TasklistService } from '../tasklist.service';
 import { NgForm } from '@angular/forms';
-import { ModifyService } from '../modify.service';
-import { Router } from '@angular/router';
+import { Details } from './leaveModel';
 @Component({
   selector: 'app-home-page',
   templateUrl: './home-page.component.html',
   styleUrls: ['./home-page.component.css']
 })
 export class HomePageComponent implements OnInit {
-  items;
-  showCalendar: boolean = false;
-  singleCalendarField: boolean = false;
-  showSortingCalendar: boolean = false;
-  projectInput: boolean = false;
-  dId = "nec03";
-  dName;
-  startDate:string;
-  endDate:string;
-  dateUpdate: boolean;
-  managerView: boolean = true;
-  developerInput: boolean = false;
-  result;
+  details=new Details();
 
-  constructor(private taskService: TasklistService,private modifyService:ModifyService, private router:Router) {
+  constructor(private taskService: TasklistService) {
   }
 
   firstDisplay() {
-    var obs = this.taskService.getTasks(this.dId);
+    var obs = this.taskService.getTasks(this.details.dId);
+    console.log(this.details.dId);
     obs.subscribe((response) => {
-      this.items = response;
-      for(let i=0;i<this.items.length;i++)
+      this.details.items = response;
+      for(let i=0;i<this.details.items.length;i++)
       {
-        this.items[i].startDate=(""+this.items[i].startDate).slice(0,10);
-        this.items[i].endDate=(""+this.items[i].endDate).slice(0,10);
+        this.details.items[i].startDate=(""+this.details.items[i].startDate).slice(0,10);
+        this.details.items[i].endDate=(""+this.details.items[i].endDate).slice(0,10);
       }
         })
   }
@@ -41,83 +29,97 @@ export class HomePageComponent implements OnInit {
     this.firstDisplay();
   }
   myFunctionSingleDay() {
-    this.showCalendar = true;
-    this.singleCalendarField = true;
-    this.showSortingCalendar = false;
-    this.projectInput = false;
-    this.developerInput = false;
+    this.details.showCalendar = true;
+    this.details.singleCalendarField = true;
+    this.details.showSortingCalendar = false;
+    this.details.projectInput = false;
+    this.details.developerInput = false;
   }
   myFunctionMultipleDays() {
-    this.showCalendar = true;
-    this.singleCalendarField = false;
-    this.showSortingCalendar = false;
-    this.projectInput = false;
-    this.developerInput = false;
+    this.details.showCalendar = true;
+    this.details.singleCalendarField = false;
+    this.details.showSortingCalendar = false;
+    this.details.projectInput = false;
+    this.details.developerInput = false;
   }
   myFunctionMultipleDaysSelect() {
-    this.showSortingCalendar = true;
-    this.projectInput = false;
-    this.developerInput = false;
-    this.showCalendar = false;
-    this.singleCalendarField = false;
+    this.details.showSortingCalendar = true;
+    this.details.projectInput = false;
+    this.details.developerInput = false;
+    this.details.showCalendar = false;
+    this.details.singleCalendarField = false;
   }
   myFunctionDeveloperSelect() {
-    this.developerInput = true;
-    this.showSortingCalendar = false;
-    this.projectInput = false;
-    this.showCalendar = false;
-    this.singleCalendarField = false;
+    this.details.developerInput = true;
+    this.details.showSortingCalendar = false;
+    this.details.projectInput = false;
+    this.details.showCalendar = false;
+    this.details.singleCalendarField = false;
   }
   collapse() {
-    this.showCalendar = false;
-    this.singleCalendarField=false;
-    this.developerInput = false;
-    this.showSortingCalendar = false;
-    this.projectInput = false;
+    this.details.showCalendar = false;
+    this.details.singleCalendarField=false;
+    this.details.developerInput = false;
+    this.details.showSortingCalendar = false;
+    this.details.projectInput = false;
     this.firstDisplay();
   }
   takeLeave(leave: NgForm) {
-    var obs = this.taskService.applyLeave(this.dId, leave.value);
+    var obs = this.taskService.applyLeave(this.details.dId, leave.value);
     obs.subscribe((response) => {
-      console.log(response)
-      //this.result=response.result;
+      if(response['result']=="update successful")
+    {
+      alert("Updated Successfully!");
+    }
+    else
+    {
+      alert("Re-submit!");
+    }
     })
   }
 
   sortingInput(sorting: NgForm) {
-    this.showSortingCalendar = true;
-    this.projectInput = !this.projectInput;
-    this.showCalendar = false;
-    this.singleCalendarField = false;
+    this.details.showSortingCalendar = true;
+    this.details.projectInput = !this.details.projectInput;
+    this.details.showCalendar = false;
+    this.details.singleCalendarField = false;
   }
 
   myFunctionProjectSelect() {
-    this.showSortingCalendar = false;
-    this.projectInput = true;
-    this.developerInput = false;
-    this.showCalendar = false;
-    this.singleCalendarField = false;
+    this.details.showSortingCalendar = false;
+    this.details.projectInput = true;
+    this.details.developerInput = false;
+    this.details.showCalendar = false;
+    this.details.singleCalendarField = false;
   }
 
   sortingDate(dateRange: NgForm) {
-    var obs = this.taskService.sortByDate(this.dId, dateRange.value);
+    var obs = this.taskService.sortByDate(this.details.dId, dateRange.value);
     obs.subscribe((response) => {
-      this.items = response;
-      for(let i=0;i<this.items.length;i++)
+      this.details.items = response;
+      if(response['result']=="unsuccessful")
       {
-        this.items[i].startDate=(""+this.items[i].startDate).slice(0,10);
-        this.items[i].endDate=(""+this.items[i].endDate).slice(0,10);
+        this.details.items=null;
+      }
+      for(let i=0;i<this.details.items.length;i++)
+      {
+        this.details.items[i].startDate=(""+this.details.items[i].startDate).slice(0,10);
+        this.details.items[i].endDate=(""+this.details.items[i].endDate).slice(0,10);
       }
     })
   }
   sortingProject(project: NgForm) {
-    var obs = this.taskService.sortByProject(this.dId, project.value);
+    var obs = this.taskService.sortByProject(this.details.dId, project.value);
     obs.subscribe((response) => {
-      this.items = response;
-      for(let i=0;i<this.items.length;i++)
+      this.details.items = response;
+      if(response['result']=="unsuccessful")
       {
-        this.items[i].startDate=(""+this.items[i].startDate).slice(0,10);
-        this.items[i].endDate=(""+this.items[i].endDate).slice(0,10);
+        this.details.items=null;
+      }
+      for(let i=0;i<this.details.items.length;i++)
+      {
+        this.details.items[i].startDate=(""+this.details.items[i].startDate).slice(0,10);
+        this.details.items[i].endDate=(""+this.details.items[i].endDate).slice(0,10);
       }
     })
   }
@@ -125,11 +127,15 @@ export class HomePageComponent implements OnInit {
     console.log(developer.value)
     var obs = this.taskService.sortByDeveloper(developer.value);
     obs.subscribe((response) => {
-      this.items = response;
-      for(let i=0;i<this.items.length;i++)
+      this.details.items = response;
+      if(response['result']=="unsuccessful")
       {
-        this.items[i].startDate=(""+this.items[i].startDate).slice(0,10);
-        this.items[i].endDate=(""+this.items[i].endDate).slice(0,10);
+        this.details.items=null;
+      }
+      for(let i=0;i<this.details.items.length;i++)
+      {
+        this.details.items[i].startDate=(""+this.details.items[i].startDate).slice(0,10);
+        this.details.items[i].endDate=(""+this.details.items[i].endDate).slice(0,10);
       }
     })
   }

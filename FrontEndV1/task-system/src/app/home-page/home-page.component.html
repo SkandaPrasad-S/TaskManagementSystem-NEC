@@ -1,24 +1,12 @@
 <div id="main">
-  <!-- <div id="header">
-    <div id="logo">
-      <div id="logo_text">
-        <img id="image" src="../assets/header-img.png" alt="NEC Technologies">
-      </div>
-    </div>
-    <div class="navigation">
-      <div class="button">
-        <button class="logoutText" mat-button (click)="logout()">LOGOUT</button>
-      </div>
-    </div>
-  </div> -->
   <div id="site_content" style="margin-top: 0px">
     <div style="float:left" id="sidebar_container">
       <div class="sidebar">
         <div class="sidebar_top"></div>
         <div class="sidebar_item">
           <h3>Developer Details</h3>
-          <h4>Developer ID: {{dId}}</h4>
-          <h4>Developer Name: {{dName}}</h4><br />
+          <h4>Developer ID: {{details.dId}}</h4>
+          <h4>Developer Name: {{dName}}</h4><br/>
           <button id="btn" mat-raised-button [matMenuTriggerFor]="menu">Take Leave</button>
           <mat-menu #menu="matMenu">
             <button mat-menu-item pattern (click)="myFunctionSingleDay()">Single day</button>
@@ -28,6 +16,36 @@
         <div class="sidebar_base"></div>
       </div>
       <div class="sidebar_base"></div>
+      <br><br>
+      <form #leave="ngForm" *ngIf="details.showCalendar" (ngSubmit)="takeLeave(leave)">
+        <div class="singleDate" *ngIf="details.singleCalendarField">
+          Date:<input class="fromText" matInput type="date" name="fromDate" ngModel><br><br>
+          Reason:<input matInput type="text" name="comment" required ngModel><br><br>
+        </div>
+        <div class="multipleDate" *ngIf="!details.singleCalendarField">
+          From:<input class="fromText" matInput type="date" name="fromDate" ngModel><br><br>
+          To:<input matInput class="toText" type="date" name="toDate" ngModel><br><br>
+          Reason:<input matInput type="text" name="comment" required ngModel><br><br>
+        </div>
+        <button id="btn" mat-raised-button type="submit">submit</button>
+        <button id="btn" mat-raised-button class="closeAll" type="submit" (click)="collapse()">Close</button>
+      </form>
+      <form #sorting="ngForm" *ngIf="details.showSortingCalendar" (ngSubmit)="sortingDate(sorting)">
+        From:<input class="fromText" type="date" matInput name="fromDate" ngModel><br><br>
+        To  :<input class="toText" matInput type="date" name="toDate" ngModel><br><br>
+        <button id="btn" mat-raised-button type="submit">submit</button>
+        <button id="btn" mat-raised-button class="closeAll" type="submit" (click)="collapse()">Close</button>
+      </form>
+      <form #project="ngForm" *ngIf="details.projectInput" (ngSubmit)="sortingProject(project)">
+        <br>Enter the project name:<input matInput type="text" name="projectName" ngModel><br><br>
+        <button id="btn" mat-raised-button type="submit">Submit</button>
+        <button id="btn" mat-raised-button class="closeAll" type="submit" (click)="collapse()">Close</button>
+      </form>
+      <form #developer="ngForm" *ngIf="details.developerInput" (ngSubmit)="sortingDeveloper(developer)">
+        <br>Enter the developer ID:<input matInput type="text" name="employeeId" ngModel><br><br>
+        <button id="btn" mat-raised-button type="submit">Submit</button>
+        <button id="btn" mat-raised-button class="closeAll" type="submit" (click)="collapse()">Close</button>
+      </form>
     </div>
     <div class="content">
       <div class="dev_table">
@@ -44,8 +62,8 @@
             <th>Total Work</th>
             <th>Remaining work</th>
           </tr>
-          <tr *ngFor="let dev of items">
-            <td><a routerLink="/display/{{dev.taskId}}">{{dev.taskId}}</a></td>
+          <tr *ngFor="let dev of details.items">
+            <td><a href="">{{dev.taskId}}</a></td>
             <td>{{dev.typeId}}</td>
             <td>{{dev.taskName}}</td>
             <td>{{dev.taskDescription}}</td>
@@ -62,41 +80,12 @@
           <mat-menu #menu2="matMenu">
             <button type="submit" mat-menu-item (click)="myFunctionMultipleDaysSelect()">By Date</button>
             <button mat-menu-item (click)="myFunctionProjectSelect()">By Project</button>
-            <button *ngIf="managerView" mat-menu-item (click)="myFunctionDeveloperSelect()">By Developer</button>
+            <button *ngIf="details.managerView" mat-menu-item (click)="myFunctionDeveloperSelect()">By Developer</button>
           </mat-menu>
-          <button id="btn" style="margin-left: 25%" mat-raised-button>Get Statistics</button>
-          <button id="btn" style="margin-left: 25%" routerLink="/createTask" mat-raised-button>Create Task</button>
-          
+          <button id="btn" style="margin-left: 9%"  mat-raised-button>Update Work Hours</button>
+          <button id="btn" style="margin-left: 9%" mat-raised-button>Get Statistics</button>
+          <button id="btn" style="margin-left: 9%"  mat-raised-button>Create Task</button>
         </div>
-        <form #leave="ngForm" *ngIf="showCalendar" (ngSubmit)="takeLeave(leave)">
-          <div class="singleDate" *ngIf="singleCalendarField">
-            Date:<input matInput type="date" name="fromDate" ngModel><br>
-            Reason:<input matInput type="text" name="comment" required ngModel><br><br>
-          </div>
-          <div class="multipleDate" *ngIf="!singleCalendarField">
-            From:<input matInput type="date" name="fromDate" ngModel><br>
-            To:<input matInput class="toText" type="date" name="toDate" ngModel><br>
-            Reason:<input matInput type="text" name="comment" required ngModel><br><br>
-          </div>
-          <button id="btn" mat-raised-button type="submit">submit</button>
-          <button id="btn" mat-raised-button class="closeAll" type="submit" (click)="collapse()">Close</button>
-        </form>
-        <form #sorting="ngForm" *ngIf="showSortingCalendar" (ngSubmit)="sortingDate(sorting)">
-          From:<input type="date" matInput name="fromDate" ngModel><br>
-          To:<input class="toText" matInput type="date" name="toDate" ngModel><br><br>
-          <button id="btn" mat-raised-button type="submit">submit</button>
-          <button id="btn" mat-raised-button class="closeAll" type="submit" (click)="collapse()">Close</button>
-        </form>
-        <form #project="ngForm" *ngIf="projectInput" (ngSubmit)="sortingProject(project)">
-          <br>Enter the project name:<input matInput type="text" name="projectName" ngModel><br><br>
-          <button id="btn" mat-raised-button type="submit">Submit</button>
-          <button id="btn" mat-raised-button class="closeAll" type="submit" (click)="collapse()">Close</button>
-        </form>
-        <form #developer="ngForm" *ngIf="developerInput" (ngSubmit)="sortingDeveloper(developer)">
-          <br>Enter the developer ID:<input matInput type="text" name="employeeId" ngModel><br><br>
-          <button id="btn" mat-raised-button type="submit">Submit</button>
-          <button id="btn" mat-raised-button class="closeAll" type="submit" (click)="collapse()">Close</button>
-        </form>
       </div>
     </div>
   </div>
