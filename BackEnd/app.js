@@ -48,7 +48,18 @@ MongoClient.connect(url, options, function (err, client) {
     assert.equal(null, err);
     conn = client.db('tms');
 
+    var wb = new xl.Workbook();
 
+    var options = {
+        margins: {
+            left: 1.5,
+            right: 1.5
+        },
+    };
+
+    var ws1 = wb.addWorksheet('week1', options)
+    var ws2 = wb.addWorksheet('week2', options)
+    var ws3 = wb.addWorksheet('week3', options)
 
     app.post("/login", function (req, res) {
 
@@ -346,7 +357,7 @@ MongoClient.connect(url, options, function (err, client) {
 
     app.post("/update/:id", function (req, res) {
 
-        var id = req.params.id;
+        var id = parseInt(req.params.id);
         var body = req.body;
 
         dbName = 'tms';
@@ -376,114 +387,6 @@ MongoClient.connect(url, options, function (err, client) {
 
     })
 
-    // app.post("/complete", function (req, res) {
-
-    //     var body = req.body;
-    //     var smyPromise = () => {
-    //         return new Promise((resolve, reject) => {
-
-    //             conn
-    //                 .collection('status')
-    //                 .find({ statusName: "closed" })
-
-    //                 .toArray(function (err, data) {
-    //                     err
-    //                         ? reject(err)
-    //                         : resolve(data[0].statusId);
-
-    //                 });
-    //         });
-    //     };
-
-    //     var myPromise = function (sid, id) {
-
-    //         conn
-    //             .collection('tasks')
-    //             .updateOne({ taskId: id }, { $set: { statusId: sid } })
-
-    //             .then(function (data) {
-
-    //             }).catch(err => {
-    //                 res.send({ "result": "unsuccessful" })
-    //             })
-
-    //         return { "result": "complete successful" };
-
-    //     }
-    //     var callMyPromise = async (id) => {
-
-
-    //         var sresult = await (smyPromise());
-
-    //         var result = (myPromise(sresult, id));
-
-    //         //anything here is executed after result is resolved
-
-    //         return result
-    //     };
-
-    //     //Step 3: make the call
-    //     callMyPromise(parseInt(body.taskId)).then(function (result) {
-
-    //         res.send(result)
-
-    //     })
-
-    // })
-
-    // app.post("/delete", function (req, res) {
-    //     var body = req.body;
-    //     var smyPromise = () => {
-    //         return new Promise((resolve, reject) => {
-
-    //             conn
-    //                 .collection('status')
-    //                 .find({ statusName: "inactive" })
-
-    //                 .toArray(function (err, data) {
-    //                     err
-    //                         ? reject(err)
-    //                         : resolve(data[0].statusId);
-
-    //                 });
-    //         });
-    //     };
-
-    //     var myPromise = function (sid, id) {
-
-    //         conn
-    //             .collection('tasks')
-    //             .updateOne({ taskId: id }, { $set: { statusId: sid } })
-
-    //             .then(function (data) {
-
-    //             }).catch(err => {
-    //                 res.send({ "result": "delete unsuccessful" })
-    //             })
-
-    //         return { "result": "delete successful" };
-
-    //     }
-    //     var callMyPromise = async (id) => {
-
-    //         var sresult = await (smyPromise());
-
-    //         var result = (myPromise(sresult, id));
-
-    //         return result
-    //     };
-
-    //     //Step 3: make the call
-    //     callMyPromise(parseInt(body.taskId)).then(function (result) {
-
-    //         res.send(result)
-
-    //     })
-
-
-
-
-    // })
 
     app.get("/logOut", function (req, res) {
 
@@ -498,12 +401,13 @@ MongoClient.connect(url, options, function (err, client) {
         var body = req.body;
         var stdate = body.fromDate;
         fromDate = new Date(new Date(stdate).toISOString())
-        if (body.toDate !== null) {
+        if (body.toDate !== undefined) {
             var endate = body.toDate
             toDate = new Date(new Date(endate).toISOString())
         }
         else
-            var toDate = null;
+            var toDate = fromDate;
+            console.log(toDate);
 
 
 
@@ -524,12 +428,13 @@ MongoClient.connect(url, options, function (err, client) {
 
         var eid = req.params.did;
         var body = req.body;
-        var datetime = new Date();
+        
+        updaateDate = new Date(new Date(body.date).toISOString()) 
         updateWorkingHours(eid, body.taskId).then(function (remaining) {
             updateHours = remaining.remainingWork - body.workedHours
             conn
                 .collection('tasks')
-                .updateOne({ $and: [{ employeeId: eid }, { taskId: body.taskId }] }, { $set: { remainingWork: updateHours } })
+                .updateOne({ $and: [{ employeeId: eid }, { taskId: body.taskId }] }, { $set: { remainingWork: updateHours,date:updateDate } })
                 .then(function (data) {
                     return conn.collection('workingHours').insertOne({ employeeId: eid, taskId: body.taskId, date: datetime, workedHours: body.workedHours })
 
@@ -575,7 +480,7 @@ MongoClient.connect(url, options, function (err, client) {
         return remaining
     }
 
-    app.post("/getStatistics/:did", (req, res) => {
+    app.get("/getStatistics/:did", (req, res) => {
 
         var eid = req.params.did;
 
@@ -594,19 +499,119 @@ MongoClient.connect(url, options, function (err, client) {
         var nextfirstday = new Date(nextfirst);
         var nextlastday = new Date(nextlast);
 
-        getStatistics(eid, firstday, lastday, prevfirstday, prevlastday, new Date(moment()), nextlastday).then(function (result) {
-            res.send(result)
+
+        getStatistics( firstday, lastday, prevfirstday, prevlastday, new Date(moment()), nextlastday).then(function (result) {
+            
+            getAllData().then(function (employeeTasks) {
+                
+                weekLog(result[0].current, employeeTasks, ws1)
+                weekLog(result[0].previous, employeeTasks, ws2)
+                weekLog(result[0].next, employeeTasks, ws3)
+
+                wb.write('statistics.xlsx', res)
+            })
         })
 
     })
-    var currentWeek = (eid, firstday, lastday) => {
-        console.log(eid)
-        console.log(firstday)
-        console.log(lastday)
+    function setHead(sheet) {
+        
+        var style = wb.createStyle({
+            font: {
+                color: 'white',
+                size: '20px'
+
+            },
+            fill: {
+                type: 'pattern', // Currently only 'pattern' is implemented. Non-implemented option is 'gradient'
+                patternType: 'solid', //ยง18.18.55 ST_PatternType (Pattern Type)
+                bgColor: 'blue', // HTML style hex value. defaults to black
+                fgColor: 'blue'
+            },
+            alignment: {
+                horizontal: 'center',
+
+            }
+
+        })
+
+        sheet.column(4).setWidth(60)
+        sheet.column(12).setWidth(40)
+        sheet.column(5).setWidth(20)
+        sheet.column(9).setWidth(20)
+        sheet.cell(1, 1).string("Resource").style(style)
+        sheet.cell(1, 2).string("Type").style(style)
+        sheet.cell(1, 3).string("TFS ID").style(style)
+        sheet.cell(1, 4).string("Description").style(style)
+        sheet.cell(1, 5).string("Remaining Work").style(style)
+        sheet.cell(1, 6).string("Start").style(style)
+        sheet.cell(1, 7).string("ETA").style(style)
+        sheet.cell(1, 8).string("Status").style(style)
+        sheet.cell(1, 9).string("Project").style(style)
+        sheet.cell(1, 10).string("Sprint").style(style)
+        sheet.cell(1, 11).string("Total Hours").style(style)
+        sheet.cell(1, 12).string("Comments").style(style)
+    }
+
+    var weekLog = (logdetails, tasks, sheet) => {
+        
+        setHead(sheet);
+        var beauty = wb.createStyle({
+            font:{
+                color:'black'
+            },
+            alignment: {
+                horizontal: 'center',
+
+            }
+        })
+        
+        let row = 1;
+        for (let i in logdetails) {
+            row++;
+            for (let j in tasks) {
+                let col = 1;
+
+                if (logdetails[i].taskId === tasks[j].taskId) {
+
+                    sheet.cell(row, col).string(tasks[j].employeeId).style(beauty)
+                    sheet.cell(row, ++col).string(tasks[j].typeName).style(beauty)
+                    sheet.cell(row, ++col).number(tasks[j].taskId).style(beauty)
+                    sheet.cell(row, ++col).string(tasks[j].taskDescription).style(beauty)
+                    sheet.cell(row, ++col).number(tasks[j].remainingWork).style(beauty)
+                    sheet.cell(row, ++col).date(tasks[j].startDate).style(beauty)
+                    sheet.cell(row, ++col).date(tasks[j].endDate).style(beauty)
+                    sheet.cell(row, ++col).string(tasks[j].statusName).style(beauty)
+                    sheet.cell(row, ++col).string(tasks[j].projectName).style(beauty)
+                    sheet.cell(row, ++col).string(tasks[j].sprint).style(beauty)
+                    sheet.cell(row, ++col).string(tasks[j].comments).style(beauty)
+                    
+                }
+            }
+        }
+    }
+
+    var currentWeek = (firstday, lastday) => {
+
         return new Promise((resolve, reject) => {
             conn
                 .collection('workingHours')
-                .find({ $and: [{ employeeId: eid }, { date: { $lte: lastday } }, { date: { $gte: firstday } }] })
+                .find({ $and: [{ date: { $lte: lastday } }, { date: { $gte: firstday } }] })
+                .toArray(function (err, data) {
+                   
+                    err
+                        ? reject(err)
+                        : resolve(data);
+
+                });
+        });
+    };
+
+    var previousWeek = (prevfirstday, prevlastday) => {
+
+        return new Promise((resolve, reject) => {
+            conn
+                .collection('workingHours')
+                .find({ $and: [{ date: { $lte: prevlastday } }, { date: { $gte: prevfirstday } }] })
                 .toArray(function (err, data) {
                     err
                         ? reject(err)
@@ -616,30 +621,12 @@ MongoClient.connect(url, options, function (err, client) {
         });
     };
 
-
-
-
-    var previousWeek = (eid, prevfirstday, prevlastday) => {
-
-        return new Promise((resolve, reject) => {
-            conn
-                .collection('workingHours')
-                .find({ $and: [{ employeeId: eid }, { date: { $lte: prevlastday } }, { date: { $gte: prevfirstday } }] })
-                .toArray(function (err, data) {
-                    err
-                        ? reject(err)
-                        : resolve(data);
-
-                });
-        });
-    };
-
-    var comingWeek = (eid, nextfirstday, nextlastday) => {
+    var comingWeek = (nextfirstday, nextlastday) => {
 
         return new Promise((resolve, reject) => {
             conn
                 .collection('tasks')
-                .find({ $and: [{ employeeId: eid }, { endDate: { $lte: nextlastday } }, { endDate: { $gte: nextfirstday } }] })
+                .find({ $and: [{ endDate: { $lte: nextlastday } }, { endDate: { $gte: nextfirstday } }] })
                 .project({ remainingWork: 1, totalWork: 1, endDate: 1, taskId: 1, employeeId: 1 })
                 .toArray(function (err, data) {
                     err
@@ -650,13 +637,12 @@ MongoClient.connect(url, options, function (err, client) {
         });
     };
 
-    var leaveDetails = (eid, fromday, today) => {
-        console.log(fromday)
-        console.log(today)
+    var leaveDetails = (fromday, today) => {
+
         return new Promise((resolve, reject) => {
             conn
                 .collection('attendance')
-                .find({ $and: [{ employeeId: eid }, { fromDate: { $gte: fromday } }, { toDate: { $lte: today } }] })
+                .find({ $and: [{ fromDate: { $gte: fromday } }, { toDate: { $lte: today } }] })
                 .toArray(function (err, data) {
                     err
                         ? reject(err)
@@ -664,16 +650,17 @@ MongoClient.connect(url, options, function (err, client) {
 
                 });
         });
-    };
+    };3
 
-    var getStatistics = async (eid, firstday, lastday, prevfirstday, prevlastday, nextfirstday, nextlastday) => {
+    var getStatistics = async (firstday, lastday, prevfirstday, prevlastday, nextfirstday, nextlastday) => {
 
-
-        var currWeek = await (currentWeek(eid, firstday, lastday));
-        var prevWeek = await (previousWeek(eid, prevfirstday, prevlastday));
-        var nextWeek = await (comingWeek(eid, nextfirstday, nextlastday));
-        var leave = await (leaveDetails(eid, prevfirstday, nextlastday))
-        var array = { "current": currWeek, "previous": prevWeek, "next": nextWeek, "leaveSummary": leave }
+        
+        var currWeek = await (currentWeek(firstday, lastday));
+        var prevWeek = await (previousWeek(prevfirstday, prevlastday));
+        var nextWeek = await (comingWeek(nextfirstday, nextlastday));
+        var leave = await (leaveDetails(prevfirstday, nextlastday));
+        
+        var array = [{ "current": currWeek, "previous": prevWeek, "next": nextWeek, "attendance": leave }]
 
         return array
     };
@@ -684,6 +671,21 @@ MongoClient.connect(url, options, function (err, client) {
                 .collection('tasks')
                 .find({ employeeId: id })
                 .toArray(function (err, data) {
+                    err
+                        ? reject(err)
+                        : resolve(data);
+
+                });
+        });
+    };
+
+    var getAllTask = () => {
+        return new Promise((resolve, reject) => {
+            conn
+                .collection('tasks')
+                .find()
+                .toArray(function (err, data) {
+                   
                     err
                         ? reject(err)
                         : resolve(data);
@@ -765,10 +767,47 @@ MongoClient.connect(url, options, function (err, client) {
             array.push(obj);
         }
 
+        
+        //anything here is executed after result is resolved
 
+        return array;
+    };
+
+    var getAllData = async () => {
+
+        var sresult = [];
+        var tresult = [];
+        var presult = [];
+        var array = [];
+        var result = await (getAllTask());
+        
+
+        for (let i in result) {
+            var data1 = await (getStatus(result[i]));
+            sresult.push(data1)
+            var data2 = await (getType(result[i]));
+            tresult.push(data2)
+            var data3 = await (getProject(result[i]));
+            presult.push(data3)
+        }
+
+        var obj;
+        for (let index in result) {
+            obj = result[index]
+            obj.statusName = sresult[index].statusName
+            obj.typeName = tresult[index].typeName
+            obj.projectName = presult[index].projectName
+            array.push(obj);
+        }
+
+        
         //anything here is executed after result is resolved
 
         return array;
     };
 })
+
+
+
+
 

@@ -1,1 +1,14 @@
+{"_id":{"$oid":"5d413162504e5a1af4b53809"},"employeeId":"nec01","taskId":{"$numberInt":"1"},"workedHours":{"$numberInt":"2"},"date":{"$date":{"$numberLong":"1564511400000"}}}
+{"_id":{"$oid":"5d4131edc19fa51af414380d"},"employeeId":"nec01","taskId":{"$numberInt":"2"},"workedHours":{"$numberInt":"2"},"date":{"$date":{"$numberLong":"1564597800000"}}}
+{"_id":{"$oid":"5d4131fec19fa51af414380e"},"employeeId":"nec01","taskId":{"$numberInt":"3"},"workedHours":{"$numberInt":"2"},"date":{"$date":{"$numberLong":"1564165800000"}}}
+{"_id":{"$oid":"5d41354c04faf7287032e415"},"employeeId":"nec04","taskId":{"$numberInt":"4"},"date":{"$date":{"$numberLong":"1564554572294"}},"workedHours":{"$numberInt":"2"}}
+{"_id":{"$oid":"5d416c2c515c6a37b84b7ab1"},"employeeId":"nec01","taskId":{"$numberInt":"1"},"date":{"$date":{"$numberLong":"1564568619993"}},"workedHours":{"$numberInt":"2"}}
+{"_id":{"$oid":"5d416c7e5da5633ae4da1c69"},"employeeId":"nec01","taskId":{"$numberInt":"1"},"date":{"$date":{"$numberLong":"1564568702464"}},"workedHours":{"$numberInt":"2"}}
+{"_id":{"$oid":"5d416c9f5da5633ae4da1c6a"},"employeeId":"nec01","taskId":{"$numberInt":"1"},"date":{"$date":{"$numberLong":"1564568735201"}},"workedHours":{"$numberInt":"2"}}
+{"_id":{"$oid":"5d416d10e621bd1a10a520f1"},"employeeId":"nec01","taskId":{"$numberInt":"1"},"date":{"$date":{"$numberLong":"1564568848905"}},"workedHours":{"$numberInt":"2"}}
+{"_id":{"$oid":"5d416d2f7268141834a28499"},"employeeId":"nec01","taskId":{"$numberInt":"1"},"date":{"$date":{"$numberLong":"1564568879466"}},"workedHours":{"$numberInt":"2"}}
+{"_id":{"$oid":"5d416d75323bb73920018ab4"},"employeeId":"nec01","taskId":{"$numberInt":"1"},"date":{"$date":{"$numberLong":"1564568949824"}},"workedHours":{"$numberInt":"2"}}
+{"_id":{"$oid":"5d416ddfed0bbe2344053fc8"},"employeeId":"nec01","taskId":{"$numberInt":"1"},"date":{"$date":{"$numberLong":"1564569055796"}},"workedHours":{"$numberInt":"2"}}
 {"_id":{"$oid":"5d416e325fd92b464cd9d8f1"},"employeeId":"nec01","taskId":{"$numberInt":"1"},"date":{"$date":{"$numberLong":"1564569138591"}},"workedHours":{"$numberInt":"2"}}
+{"_id":{"$oid":"5d418023db0b0a48e8f376a6"},"employeeId":"nec01","taskId":{"$numberInt":"1"},"date":{"$date":{"$numberLong":"1564573731237"}},"workedHours":{"$numberInt":"2"}}
+{"_id":{"$oid":"5d418044b6222f4afc86235e"},"employeeId":"nec01","taskId":{"$numberInt":"1"},"date":{"$date":{"$numberLong":"1564573764362"}},"workedHours":{"$numberInt":"2"}}
