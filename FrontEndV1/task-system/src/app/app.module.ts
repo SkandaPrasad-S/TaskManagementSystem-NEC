@@ -16,6 +16,7 @@ import { HeaderComponent } from './header/header.component';
 import { DisplayModifyComponent } from './display-modify/display-modify.component';
 import { ModifyService } from './modify.service';
 import { CreateService } from './create.service';
+import { WorkingHoursComponent } from './working-hours/working-hours.component';
 
 @NgModule({
   declarations: [
@@ -25,7 +26,8 @@ import { CreateService } from './create.service';
     CrudTaskComponent,
     GetStatsReportComponent,
     HeaderComponent,
-    DisplayModifyComponent
+    DisplayModifyComponent,
+    WorkingHoursComponent
   ],
   imports: [
     BrowserModule,
