@@ -1,3 +1,6 @@
 {"_id":{"$oid":"5d3a78a0504e5a1af4b53806"},"employeeId":"nec01","fromDate":{"$date":{"$numberLong":"1564338600000"}},"toDate":{"$date":{"$numberLong":"1564338600000"}},"comment":"reason"}
 {"_id":{"$oid":"5d3a7972c19fa51af414380a"},"employeeId":"nec01","fromDate":{"$date":{"$numberLong":"1564338600000"}},"toDate":{"$date":{"$numberLong":"1564338600000"}},"comment":"reason"}
-{"_id":{"$oid":"5d3e7c4081e69d41f82d61b0"},"employeeId":"nec01","fromDate":{"$date":{"$numberLong":"1564358400000"}},"toDate":null}
+{"_id":{"$oid":"5d3e7c4081e69d41f82d61b0"},"employeeId":"nec01","fromDate":{"$date":{"$numberLong":"1564358400000"}},"toDate":{"$date":{"$numberLong":"1564338600000"}}}
+{"_id":{"$oid":"5d43be74ea56bc157045c455"},"employeeId":"nec01","fromDate":{"$date":{"$numberLong":"1564617600000"}},"toDate":{"$date":{"$numberLong":"1564617600000"}},"comment":null}
+{"_id":{"$oid":"5d43be897abd2a03141c0bb9"},"employeeId":"nec01","fromDate":{"$date":{"$numberLong":"1564617600000"}},"toDate":{"$date":{"$numberLong":"1564617600000"}},"comment":null}
+{"_id":{"$oid":"5d43bee1dbff7148d0bef23a"},"employeeId":"nec01","fromDate":{"$date":{"$numberLong":"1564617600000"}},"toDate":{"$date":{"$numberLong":"1564617600000"}},"comment":null}
