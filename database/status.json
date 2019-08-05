@@ -1,3 +1,0 @@
-{"_id":{"$oid":"5d3a72e2504e5a1af4b53803"},"statusName":"active","statusId":{"$numberInt":"2"}}
-{"_id":{"$oid":"5d3a7339c19fa51af4143809"},"statusName":"closed","statusId":{"$numberInt":"3"}}
-{"_id":{"$oid":"5d416393c19fa51af414380f"},"statusName":"toDo","statusId":{"$numberInt":"1"}}
