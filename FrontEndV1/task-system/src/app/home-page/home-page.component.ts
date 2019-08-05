@@ -14,8 +14,8 @@ export class HomePageComponent implements OnInit {
   }
 
   firstDisplay() {
-    var obs = this.taskService.getTasks(this.details.dId);
-    console.log(this.details.dId);
+    var obs = this.taskService.getTasks(this.details.developerId);
+    console.log(this.details.developerId);
     obs.subscribe((response) => {
       this.details.items = response;
       for(let i=0;i<this.details.items.length;i++)
@@ -65,7 +65,7 @@ export class HomePageComponent implements OnInit {
     this.firstDisplay();
   }
   takeLeave(leave: NgForm) {
-    var obs = this.taskService.applyLeave(this.details.dId, leave.value);
+    var obs = this.taskService.applyLeave(this.details.developerId, leave.value);
     obs.subscribe((response) => {
       if(response['result']=="update successful")
     {
@@ -94,7 +94,7 @@ export class HomePageComponent implements OnInit {
   }
 
   sortingDate(dateRange: NgForm) {
-    var obs = this.taskService.sortByDate(this.details.dId, dateRange.value);
+    var obs = this.taskService.sortByDate(this.details.developerId, dateRange.value);
     obs.subscribe((response) => {
       this.details.items = response;
       if(response['result']=="unsuccessful")
@@ -109,7 +109,7 @@ export class HomePageComponent implements OnInit {
     })
   }
   sortingProject(project: NgForm) {
-    var obs = this.taskService.sortByProject(this.details.dId, project.value);
+    var obs = this.taskService.sortByProject(this.details.developerId, project.value);
     obs.subscribe((response) => {
       this.details.items = response;
       if(response['result']=="unsuccessful")
