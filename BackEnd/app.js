@@ -57,9 +57,9 @@ MongoClient.connect(url, options, function (err, client) {
         },
     };
 
-    var ws1 = wb.addWorksheet('week1', options)
-    var ws2 = wb.addWorksheet('week2', options)
-    var ws3 = wb.addWorksheet('week3', options)
+    var ws1 = wb.addWorksheet('Current Week Log', options)
+    var ws2 = wb.addWorksheet('Previous Week Log', options)
+    var ws3 = wb.addWorksheet('Next Week Log', options)
     var ws4 = wb.addWorksheet('Work Allocation Summary', options)
 
     app.post("/login", function (req, res) {
@@ -424,37 +424,7 @@ MongoClient.connect(url, options, function (err, client) {
 
     })
 
-    app.post("/setWorkingHours/:did", (req, res) => {
 
-
-        var eid = req.params.did;
-        var body = req.body;
-
-        updaateDate = new Date(new Date(body.date).toISOString())
-        updateWorkingHours(eid, body.taskId).then(function (remaining) {
-            updateHours = remaining.remainingWork - body.workedHours
-            conn
-                .collection('tasks')
-                .updateOne({ $and: [{ employeeId: eid }, { taskId: body.taskId }] }, { $set: { remainingWork: updateHours, date: updateDate } })
-                .then(function (data) {
-                    return conn.collection('workingHours').insertOne({ employeeId: eid, taskId: body.taskId, date: datetime, workedHours: body.workedHours })
-
-                        .then(function (dbs) {
-                            res.status(200).send({ "result": "insert successful" });
-
-                        }).catch(err => {
-                            console.log(err);
-                            res.status(400).send({ "result": "insert unsuccessful" });
-                        })
-                }).catch(err => {
-                    console.log(err)
-                })
-
-        })
-
-
-
-    })
 
     app.post("/getWorkingHours/:did", (req, res) => {
 
@@ -467,13 +437,66 @@ MongoClient.connect(url, options, function (err, client) {
         console.log(findDate)
         conn
             .collection('tasks')
-            .find({ $and: [{ employeeId: eid },{startDate:{$lte:findDate}},{endDate:{$gte:findDate}}] }).toArray()
+            .find({ $and: [{ employeeId: eid }, { startDate: { $lte: findDate } }, { endDate: { $gte: findDate } }] }).toArray()
             .then(function (data) {
-               res.send(data)
+                res.send(data)
             }).catch(err => {
                 console.log(err)
             })
 
+    })
+
+    app.post("/getLog/:did", (req, res) => {
+
+
+        var eid = req.params.did;
+        var body = req.body;
+
+        findDate = new Date().toISOString().slice(0, 10);
+        var output = []
+        
+        conn
+            .collection('workingHours')
+            .find({ $and: [{ employeeId: eid }] }).toArray()
+            .then(function (data) {
+                
+                for (var item of data) {
+                   
+                    var newDate = new Date(item.date).toISOString().slice(0, 10);
+                    if (newDate === findDate)
+                        output.push(item)
+                }
+                res.send(output)
+
+
+            }).catch(err => {
+                console.log(err)
+            })
+
+
+    })
+
+    app.post("/deleteLog/:did", (req, res) => {
+
+
+        var eid = req.params.did;
+        var body = req.body;
+
+        deleteDate = new Date(new Date(body.date))
+        
+        conn
+            .collection('workingHours')
+            .deleteOne({ $and: [{ employeeId: eid },{taskId : body.taskId},{workedHours:body.workedHours},{date:deleteDate}] })
+            .then(function (data) {
+                
+               
+                res.send({"result":"delete successful"})
+
+
+            }).catch(err => {
+                res.send({"result":"delete unsuccessful"})
+                console.log(err)
+            })
     })
 
 
@@ -642,7 +665,7 @@ MongoClient.connect(url, options, function (err, client) {
             },
             fill: {
                 type: 'pattern', // Currently only 'pattern' is implemented. Non-implemented option is 'gradient'
-                patternType: 'solid', //§18.18.55 ST_PatternType (Pattern Type)
+                patternType: 'solid', //�18.18.55 ST_PatternType (Pattern Type)
                 bgColor: 'blue', // HTML style hex value. defaults to black
                 fgColor: 'blue'
             },
@@ -689,8 +712,10 @@ MongoClient.connect(url, options, function (err, client) {
             row++;
             for (let j in tasks) {
                 let col = 1;
+                //console.log(i+" "+j)
 
                 if (logdetails[i].taskId === tasks[j].taskId) {
+                   // console.log("true"+i+" "+j)
 
                     sheet.cell(row, col).string(tasks[j].employeeId).style(beauty)
                     sheet.cell(row, ++col).string(tasks[j].typeName).style(beauty)
@@ -702,7 +727,9 @@ MongoClient.connect(url, options, function (err, client) {
                     sheet.cell(row, ++col).string(tasks[j].statusName).style(beauty)
                     sheet.cell(row, ++col).string(tasks[j].projectName).style(beauty)
                     sheet.cell(row, ++col).string(tasks[j].sprint).style(beauty)
+                    sheet.cell(row, ++col).number(tasks[j].totalWork).style(beauty)
                     sheet.cell(row, ++col).string(tasks[j].comments).style(beauty)
+                    //console.log("tasks  ::"+j+"   "+tasks[j].employeeId)
 
                 }
             }
@@ -723,7 +750,7 @@ MongoClient.connect(url, options, function (err, client) {
             },
             fill: {
                 type: 'pattern', // Currently only 'pattern' is implemented. Non-implemented option is 'gradient'
-                patternType: 'solid', //§18.18.55 ST_PatternType (Pattern Type)
+                patternType: 'solid', //�18.18.55 ST_PatternType (Pattern Type)
                 bgColor: 'blue', // HTML style hex value. defaults to black
                 fgColor: 'blue'
             },
@@ -765,10 +792,12 @@ MongoClient.connect(url, options, function (err, client) {
 
             for (let el of eobj) {
                 emp.projectId = "" + emp.projectId
+                
                 if (el.employeeId === emp.employeeId) {
                     flag = 1;
-                    el.projectName += " , " + emp.projectName;
-                    el.projectId += "  " + "," + " " + emp.projectId;
+                    
+                    el.projectName += "^" + emp.projectName;
+                     el.projectId += ","+ emp.projectId;
                 }
                 else {
                     flag = 0;
@@ -777,11 +806,30 @@ MongoClient.connect(url, options, function (err, client) {
             if (flag === 0) {
                 eobj.push(emp)
             }
+            console.log(eobj)
 
         }
+        
         let row = 2;
+        
+        var idarray = [];
+        var prevarray = [];
+        var curarray = [];
+        var nextarray = [];
+        var namesarray = [];
         for (let emp of eobj) {
+            var IDs= emp.projectId.split(",");
+            var projects= emp.projectName.split("^");
             var col = 1;
+            for(var id of IDs){
+                if(idarray.includes(id)){
+                    
+                }
+                else{
+                    idarray.push(id);
+                }
+
+            }
             var curSum = 0
             for (let c of current) {
                 if (c.employeeId === emp.employeeId) {
@@ -810,10 +858,17 @@ MongoClient.connect(url, options, function (err, client) {
                     comment = comment + l.comment + "    ";
                 }
             }
+            
+            for(let k in IDs){
 
+            }
             sheet.cell(row, col).string(emp.employeeId).style(beauty)
-            sheet.cell(row, ++col).string(emp.projectId).style(beauty)
-            sheet.cell(row, ++col).string(emp.projectName).style(beauty)
+            ++col
+            ++col
+            for(let i in IDs){
+                sheet.cell(row,--col).string(IDs[i]).style(beauty)
+                sheet.cell(row++,++col).string(projects[i]).style(beauty)
+            }
             sheet.cell(row, ++col).number(prevSum).style(beauty)
             sheet.cell(row, ++col).number(curSum).style(beauty)
             sheet.cell(row, ++col).number(nextSum).style(beauty)
