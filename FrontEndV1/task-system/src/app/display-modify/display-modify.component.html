@@ -7,7 +7,7 @@
     <table class="task-width" cellspacing="0" style="color:black;">
         <tr>
             <td>
-                <mat-form-field class="task-width" *ngIf="!viewFlag && !createFlag">
+                <mat-form-field class="task-width" *ngIf="!createFlag">
                     <input name="taskId" matInput placeholder="Task ID" [readonly]="true" pattern="[0-9]+"
                         value="{{displayObj.taskId}}" required>
                     <mat-error>Please enter a valid Task ID</mat-error>

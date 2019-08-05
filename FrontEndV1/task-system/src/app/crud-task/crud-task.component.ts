@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { CreateService } from '../create.service';
+import { Router } from '@angular/router';
 // import {FormBuilder, FormGroup} from '@angular/forms';
 
 
@@ -12,7 +13,7 @@ import { CreateService } from '../create.service';
 
 export class CrudTaskComponent implements OnInit {
   // fn:FormGroup;
-  constructor(private createSer:CreateService){
+  constructor(private createSer:CreateService,private router:Router){
     // this.fn=fb.group({});
   }
   pagetitle = "Create Task"; 
@@ -56,12 +57,14 @@ export class CrudTaskComponent implements OnInit {
     obs.subscribe((response)=>{
       this.items=response;
       console.log(response);
+      this.router.navigateByUrl("home");
     })
   }
   }
   checkForm(createTask:NgForm){
     if(createTask.valid && this.dateStatus==false){
       console.log("no error")
+      alert('Task Created');
       return true;
     }
     else
