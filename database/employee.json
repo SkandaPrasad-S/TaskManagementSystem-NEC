@@ -1,0 +1,3 @@
+{"_id":{"$oid":"5d3193eaf9ed6e171413dcae"},"employeeId":"nec01","password":"xyz","employeeName":"Krithi","designation":"software developer"}
+{"_id":{"$oid":"5d319477bc3aa517148e8a41"},"employeeId":"nec02","password":"xyz","employeeName":"Likhita","designation":"software tester"}
+{"_id":{"$oid":"5d31949cbc3aa517148e8a42"},"employeeId":"nec03","password":"xyz","employeeName":"Manasa","designation":"manager"}
