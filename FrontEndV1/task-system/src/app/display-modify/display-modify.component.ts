@@ -23,17 +23,16 @@ export class DisplayModifyComponent implements OnInit {
   buttonaction2="Copy and Create";
   statusObj;
   projectsObj;
+  typesObj;
   dateStatus=false;
   responseFromModify;
   ngOnInit(): void {
-    //Called after the constructor, initializing input properties, and the first call to ngOnChanges.
-    //Add 'implements OnInit' to the class.
-    // this.Displaypage();
     this.taskIdFromURL = location.pathname.valueOf().split('/display/').pop();
     console.log(this.taskIdFromURL);
     this.displayDetails(this.taskIdFromURL);
     this.getProjectDetails();
     this.getStatusDetails();
+    this.getTypeDetails();
 
   }
   gotomodify(){
@@ -59,6 +58,12 @@ export class DisplayModifyComponent implements OnInit {
       this.storeEndDate=(this.displayObj.endDate+"").slice(0,10);
       console.log(this.storeEndDate);
     })
+  }
+  getTypeDetails(){
+    let obs1=this.createSer.getTypes()
+    obs1.subscribe((response)=>{
+      this.typesObj=response;      
+    });
   }
   getStatusDetails(){
     let obs=this.createSer.getStatusId()

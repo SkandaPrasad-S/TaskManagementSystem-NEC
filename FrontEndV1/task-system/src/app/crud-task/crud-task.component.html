@@ -20,11 +20,15 @@
 
             </td>
             <td>
-                <mat-form-field class="task-width">
-                    <input name="typeId" matInput placeholder="TypeID"  value="{{type}}"
-                        pattern="[0-9]+" ngModel required>
-                    <mat-error>Please enter a valid Type ID</mat-error>
-                </mat-form-field>
+                    <mat-form-field style="width:100%;">
+                            <mat-label>Type Name</mat-label>
+                            <mat-select name="typeId" ngModel required>
+                                <mat-option *ngFor="let s of typesObject;" [value]="s.typeId">
+                                    {{s.typeName}}
+                                </mat-option>
+                            </mat-select>
+                            <mat-error>Please fill this field</mat-error>
+                        </mat-form-field>
 
             </td>
         </tr>

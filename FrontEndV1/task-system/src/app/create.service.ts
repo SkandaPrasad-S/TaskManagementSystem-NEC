@@ -27,4 +27,7 @@ export class CreateService {
   getProjects(){
     return this.http.get('http://localhost:3000/getProjects')
   }
+  getTypes(){
+    return this.http.get('http://localhost:3000/getTypes')
+  }
 }

@@ -22,6 +22,7 @@ export class CrudTaskComponent implements OnInit {
   items;
   statusObject;
   projectsObject;
+  typesObject;
   dateStatus = false;
   
   ngOnInit(): void {
@@ -29,6 +30,7 @@ export class CrudTaskComponent implements OnInit {
     //Add 'implements OnInit' to the class
     this.getProjectDetails();
     this.getStatusDetails();
+    this.getTypeDetails();
   }
  
   
@@ -47,6 +49,13 @@ export class CrudTaskComponent implements OnInit {
       this.projectsObject=response;
       console.log(response);
       
+    });
+  }
+
+  getTypeDetails(){
+    let obs1=this.createSer.getTypes()
+    obs1.subscribe((response)=>{
+      this.typesObject=response;      
     });
   }
  

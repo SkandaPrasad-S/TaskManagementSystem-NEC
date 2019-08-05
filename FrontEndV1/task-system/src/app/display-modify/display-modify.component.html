@@ -19,7 +19,7 @@
                 </mat-form-field>
             </td>
             <td>
-                <mat-form-field class="task-width" *ngIf="!viewFlag">
+                <!-- <mat-form-field class="task-width" *ngIf="!viewFlag">
                     <input name="typeId" matInput placeholder="TypeID" [readonly]="statuscontentedit"
                         value="{{displayObj.typeId}}" pattern="[0-9]+" required>
                     <mat-error>Please enter a valid Type ID</mat-error>
@@ -30,7 +30,20 @@
                             pattern="[0-9]+" required>
                         <mat-error>Please enter a valid Type ID</mat-error>
                     </mat-form-field>
-                </div>
+                </div> -->
+                <mat-form-field style="width: 100%" *ngIf="viewFlag">
+                        <mat-label>Current status</mat-label>
+                        <mat-select name="typeId" ngModel required>
+                            <mat-option *ngFor="let s of typesObj" [value]="s.typeId">
+                                {{s.typeName}}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error>Please fill this field</mat-error>
+                    </mat-form-field>
+                    <mat-form-field style="float:left;width:100%" *ngIf="!viewFlag">
+                        <input name="typeId" matInput value="{{displayObj.typeName}}" [readonly]="statuscontentedit"
+                            placeholder="Type Name" required>
+                    </mat-form-field>
             </td>
         </tr>
         <tr>
