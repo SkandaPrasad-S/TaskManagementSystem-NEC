@@ -481,24 +481,31 @@ MongoClient.connect(url, options, function (err, client) {
 
 
         var eid = req.params.did;
-        
+        var body = req.body
 
         findDate = new Date(body.date).toISOString().slice(0, 10);
         var output = []
-
+        fDate = new Date(findDate)
+        console.log(findDate)
         conn
             .collection('workingHours')
-            .find({ $and: [{ employeeId: eid },{date:findDate}] }).toArray()
-            .then(function (data) {
-
+            .find({ $and: [{ employeeId: eid },{date:fDate}] }).toArray()
+            .then(async function (data) {
+               
                 for (var item of data) {
 
                     var newDate = new Date(item.date).toISOString().slice(0, 10);
-                    if (newDate === findDate)
-                        output.push(item)
-                }
-                res.send(output)
-
+                    var task = await taskOfemp(body.taskId);
+                        if (newDate === findDate){
+                            item.taskName=task.taskName;
+                            item.startDate = task.startDate;
+                            item.endDate = task.endDate;
+                            
+                            output.push(item)
+                        
+                        }
+                    }
+                   res.send(output)
 
             }).catch(err => {
                 console.log(err)
@@ -507,6 +514,17 @@ MongoClient.connect(url, options, function (err, client) {
 
     })
 
+    var taskOfemp =  (tid)=>{
+        return new Promise((resolve, reject) => {
+            conn.collection('tasks').find({taskId:tid}).toArray(function(err,task){
+                err
+                ? reject(err)
+                : resolve(task[0]);
+
+            })
+        })
+
+    }
     app.post("/deleteLog/:did", (req, res) => {
 
         console.log(req.body)
@@ -832,6 +850,7 @@ MongoClient.connect(url, options, function (err, client) {
 
         flag = 0;
         var eobj = [];
+        var pobj = [];
         for (let emp of employeeTasks) {
 
 
@@ -840,10 +859,19 @@ MongoClient.connect(url, options, function (err, client) {
 
                 if (el.employeeId === emp.employeeId) {
                     flag = 1;
-
-                    el.projectName += "^" + emp.projectName;
-                    el.projectId += "," + emp.projectId;
-                    el.taskId += "," +emp.taskId;
+                    index=pobj.findIndex(function(element){
+                        return element.projectId===emp.projectId;
+                    })
+                    console.log(index)
+                    if(index>=0){
+                        pobj[index].taskId.push(emp.taskId);
+                    }
+                    else{
+                        pobj.push({"projectId":emp.projectId,"projectName":emp.projectName,"taskId":[emp.taskId]})
+                    }
+                    console.log("...............",pobj)
+                    
+                    emp[0]["project"]=pobj;
                 }
                 else {
                     flag = 0;
@@ -864,9 +892,9 @@ MongoClient.connect(url, options, function (err, client) {
         var nextarray = [];
         var namesarray = [];
         for (let emp of eobj) {
-            var IDs = emp.projectId.split(",");
-            var projects = emp.projectName.split("^");
-            var tIDs = emp.taskId.split(",");
+            // var IDs = emp.projectId.split(",");
+            // var projects = emp.projectName.split("^");
+            // var tIDs = emp.taskId.split(",");
             var col = 1;
             var curSum = 0
             var prevSum = 0
