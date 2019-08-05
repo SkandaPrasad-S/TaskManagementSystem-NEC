@@ -481,14 +481,14 @@ MongoClient.connect(url, options, function (err, client) {
 
 
         var eid = req.params.did;
-        var body = req.body;
+        
 
-        findDate = new Date().toISOString().slice(0, 10);
+        findDate = new Date(body.date).toISOString().slice(0, 10);
         var output = []
 
         conn
             .collection('workingHours')
-            .find({ $and: [{ employeeId: eid }] }).toArray()
+            .find({ $and: [{ employeeId: eid },{date:findDate}] }).toArray()
             .then(function (data) {
 
                 for (var item of data) {
@@ -866,29 +866,33 @@ MongoClient.connect(url, options, function (err, client) {
         for (let emp of eobj) {
             var IDs = emp.projectId.split(",");
             var projects = emp.projectName.split("^");
+            var tIDs = emp.taskId.split(",");
             var col = 1;
-            for (var id of IDs) {
+            var curSum = 0
+            var prevSum = 0
+            var nextSum = 0
+            for (var id of tIDs) {
                 if (idarray.includes(id)) {
-
+                    for (let c of current) {
+                        if (c.employeeId === emp.employeeId && c.taskId === emp.taskId) {
+                            curSum = curSum + c.workedHours;
+                        }
+                    }
                 }
                 else {
                     idarray.push(id);
                 }
 
             }
-            var curSum = 0
-            for (let c of current) {
-                if (c.employeeId === emp.employeeId) {
-                    curSum = curSum + c.workedHours;
-                }
-            }
-            var prevSum = 0
+            
+           
+            
             for (let p of previous) {
                 if (p.employeeId === emp.employeeId) {
                     prevSum = prevSum + p.workedHours;
                 }
             }
-            var nextSum = 0
+            
             for (let n of next) {
                 if (n.employeeId === emp.employeeId) {
                     nextSum = nextSum + n.remainingWork;
