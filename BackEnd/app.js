@@ -431,21 +431,52 @@ MongoClient.connect(url, options, function (err, client) {
 
         var eid = req.params.did;
         var body = req.body;
-
+        var result = []
         findDate = new Date(body.date)
 
         console.log(findDate)
         conn
             .collection('tasks')
             .find({ $and: [{ employeeId: eid }, { startDate: { $lte: findDate } }, { endDate: { $gte: findDate } }] }).toArray()
-            .then(function (data) {
-                res.send(data)
+            .then(async function (data) {
+
+                for (let i in data) {
+                    var len = data.length
+
+                    logdata = await call(data[i].taskId, eid)
+                    if (logdata.length > 0) {
+
+                        result.push({ "log": logdata })
+
+
+                    }
+                    if (i == (len - 1)) {
+                        res.send(result)
+                    }
+
+                }
+
+
             }).catch(err => {
                 console.log(err)
             })
 
     })
 
+
+    var call = (tid, eid) => {
+        return new Promise((resolve, reject) => {
+            conn
+                .collection('workingHours')
+                .find({ $and: [{ employeeId: eid }, { taskId: tid }] }).toArray(function (err, result) {
+                    err
+                        ? reject(err)
+                        : resolve(result);
+
+                })
+
+        })
+    }
     app.post("/getLog/:did", (req, res) => {
 
 
@@ -454,14 +485,14 @@ MongoClient.connect(url, options, function (err, client) {
 
         findDate = new Date().toISOString().slice(0, 10);
         var output = []
-        
+
         conn
             .collection('workingHours')
             .find({ $and: [{ employeeId: eid }] }).toArray()
             .then(function (data) {
-                
+
                 for (var item of data) {
-                   
+
                     var newDate = new Date(item.date).toISOString().slice(0, 10);
                     if (newDate === findDate)
                         output.push(item)
@@ -478,25 +509,39 @@ MongoClient.connect(url, options, function (err, client) {
 
     app.post("/deleteLog/:did", (req, res) => {
 
-
+        console.log(req.body)
         var eid = req.params.did;
         var body = req.body;
-
-        deleteDate = new Date(new Date(body.date))
-        
-        conn
-            .collection('workingHours')
-            .deleteOne({ $and: [{ employeeId: eid },{taskId : body.taskId},{workedHours:body.workedHours},{date:deleteDate}] })
-            .then(function (data) {
-                
-               
-                res.send({"result":"delete successful"})
+        console.log(eid)
+        console.log(typeof(body.taskId))
+        console.log(typeof(body.workedHours))
+        deleteDate = new Date(new Date(body.date)).toISOString()
 
 
-            }).catch(err => {
-                res.send({"result":"delete unsuccessful"})
-                console.log(err)
-            })
+        updateDate = new Date(new Date(body.date).toISOString())
+
+        console.log(updateDate)
+        updateWorkingHours(eid, body.taskId).then(function (remaining) {
+            updateHours = remaining.remainingWork + body.workedHours
+            conn
+                .collection('tasks')
+                .updateOne({ $and: [{ employeeId: eid }, { taskId: body.taskId }] }, { $set: { remainingWork: updateHours } })
+                .then(function (data) {
+                    conn
+                        .collection('workingHours')
+                        .deleteOne({ $and: [{ employeeId: eid }, { taskId: body.taskId }, { workedHours: body.workedHours }, { date: updateDate }] })
+                        .then(function (data) {
+                            res.send({ "result": "delete successful" })
+                        }).catch(err => {
+                            res.send({ "result": "delete unsuccessful" })
+                            console.log(err)
+                        })
+                }).catch(function (err) { })
+        })
+
+
+
+
     })
 
 
@@ -528,7 +573,7 @@ MongoClient.connect(url, options, function (err, client) {
                                         updateHours = remaining.remainingWork - body.workedHours
                                         conn
                                             .collection('tasks')
-                                            .updateOne({ $and: [{ employeeId: eid }, { taskId: body.taskId }] }, { $set: { remainingWork: updateHours, date: updateDate } })
+                                            .updateOne({ $and: [{ employeeId: eid }, { taskId: body.taskId }] }, { $set: { remainingWork: updateHours } })
                                             .then(function (data) {
                                             }).catch(function (err) { })
                                     })
@@ -553,7 +598,7 @@ MongoClient.connect(url, options, function (err, client) {
                                     updateHours = remaining.remainingWork - body.workedHours
                                     conn
                                         .collection('tasks')
-                                        .updateOne({ $and: [{ employeeId: eid }, { taskId: body.taskId }] }, { $set: { remainingWork: updateHours, date: updateDate } })
+                                        .updateOne({ $and: [{ employeeId: eid }, { taskId: body.taskId }] }, { $set: { remainingWork: updateHours } })
                                         .then(function (data) {
                                         }).catch(function (err) { })
                                 })
@@ -665,7 +710,7 @@ MongoClient.connect(url, options, function (err, client) {
             },
             fill: {
                 type: 'pattern', // Currently only 'pattern' is implemented. Non-implemented option is 'gradient'
-                patternType: 'solid', //�18.18.55 ST_PatternType (Pattern Type)
+                patternType: 'solid', //§18.18.55 ST_PatternType (Pattern Type)
                 bgColor: 'blue', // HTML style hex value. defaults to black
                 fgColor: 'blue'
             },
@@ -715,7 +760,7 @@ MongoClient.connect(url, options, function (err, client) {
                 //console.log(i+" "+j)
 
                 if (logdetails[i].taskId === tasks[j].taskId) {
-                   // console.log("true"+i+" "+j)
+                    // console.log("true"+i+" "+j)
 
                     sheet.cell(row, col).string(tasks[j].employeeId).style(beauty)
                     sheet.cell(row, ++col).string(tasks[j].typeName).style(beauty)
@@ -750,7 +795,7 @@ MongoClient.connect(url, options, function (err, client) {
             },
             fill: {
                 type: 'pattern', // Currently only 'pattern' is implemented. Non-implemented option is 'gradient'
-                patternType: 'solid', //�18.18.55 ST_PatternType (Pattern Type)
+                patternType: 'solid', //§18.18.55 ST_PatternType (Pattern Type)
                 bgColor: 'blue', // HTML style hex value. defaults to black
                 fgColor: 'blue'
             },
@@ -792,12 +837,13 @@ MongoClient.connect(url, options, function (err, client) {
 
             for (let el of eobj) {
                 emp.projectId = "" + emp.projectId
-                
+
                 if (el.employeeId === emp.employeeId) {
                     flag = 1;
-                    
+
                     el.projectName += "^" + emp.projectName;
-                     el.projectId += ","+ emp.projectId;
+                    el.projectId += "," + emp.projectId;
+                    el.taskId += "," +emp.taskId;
                 }
                 else {
                     flag = 0;
@@ -809,23 +855,23 @@ MongoClient.connect(url, options, function (err, client) {
             console.log(eobj)
 
         }
-        
+
         let row = 2;
-        
+
         var idarray = [];
         var prevarray = [];
         var curarray = [];
         var nextarray = [];
         var namesarray = [];
         for (let emp of eobj) {
-            var IDs= emp.projectId.split(",");
-            var projects= emp.projectName.split("^");
+            var IDs = emp.projectId.split(",");
+            var projects = emp.projectName.split("^");
             var col = 1;
-            for(var id of IDs){
-                if(idarray.includes(id)){
-                    
+            for (var id of IDs) {
+                if (idarray.includes(id)) {
+
                 }
-                else{
+                else {
                     idarray.push(id);
                 }
 
@@ -858,16 +904,16 @@ MongoClient.connect(url, options, function (err, client) {
                     comment = comment + l.comment + "    ";
                 }
             }
-            
-            for(let k in IDs){
+
+            for (let k in IDs) {
 
             }
             sheet.cell(row, col).string(emp.employeeId).style(beauty)
             ++col
             ++col
-            for(let i in IDs){
-                sheet.cell(row,--col).string(IDs[i]).style(beauty)
-                sheet.cell(row++,++col).string(projects[i]).style(beauty)
+            for (let i in IDs) {
+                sheet.cell(row, --col).string(IDs[i]).style(beauty)
+                sheet.cell(row++, ++col).string(projects[i]).style(beauty)
             }
             sheet.cell(row, ++col).number(prevSum).style(beauty)
             sheet.cell(row, ++col).number(curSum).style(beauty)
