@@ -15,8 +15,8 @@ export class Details {
     singleCalendarField: boolean = false;
     showSortingCalendar: boolean = false;
     projectInput: boolean = false;
-    dId = "nec01";
-    dName;
+    developerId = "nec01";
+    developerName;
     startDate: string;
     endDate: string;
     dateUpdate: boolean;

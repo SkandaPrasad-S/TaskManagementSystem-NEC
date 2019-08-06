@@ -5,8 +5,8 @@
         <div class="sidebar_top"></div>
         <div class="sidebar_item">
           <h3>Developer Details</h3>
-          <h4>Developer ID: {{details.dId}}</h4>
-          <h4>Developer Name: {{dName}}</h4><br/>
+          <h4>Developer ID: {{details.developerId}}</h4>
+          <h4>Developer Name: {{developerName}}</h4><br />
           <button id="btn" mat-raised-button [matMenuTriggerFor]="menu">Take Leave</button>
           <mat-menu #menu="matMenu">
             <button mat-menu-item pattern (click)="myFunctionSingleDay()">Single day</button>
@@ -32,7 +32,7 @@
       </form>
       <form #sorting="ngForm" *ngIf="details.showSortingCalendar" (ngSubmit)="sortingDate(sorting)">
         From:<input class="fromText" type="date" matInput name="fromDate" ngModel><br><br>
-        To  :<input class="toText" matInput type="date" name="toDate" ngModel><br><br>
+        To :<input class="toText" matInput type="date" name="toDate" ngModel><br><br>
         <button id="btn" mat-raised-button type="submit">submit</button>
         <button id="btn" mat-raised-button class="closeAll" type="submit" (click)="collapse()">Close</button>
       </form>
@@ -80,11 +80,16 @@
           <mat-menu #menu2="matMenu">
             <button type="submit" mat-menu-item (click)="myFunctionMultipleDaysSelect()">By Date</button>
             <button mat-menu-item (click)="myFunctionProjectSelect()">By Project</button>
-            <button *ngIf="details.managerView" mat-menu-item (click)="myFunctionDeveloperSelect()">By Developer</button>
+            <button *ngIf="details.managerView" mat-menu-item (click)="myFunctionDeveloperSelect()">By
+              Developer</button>
           </mat-menu>
-          <button id="btn" style="margin-left: 9%"  mat-raised-button>Update Work Hours</button>
-          <button id="btn" style="margin-left: 9%" mat-raised-button>Get Statistics</button>
-          <button id="btn" style="margin-left: 9%"  mat-raised-button>Create Task</button>
+          <button id="btn" style="margin-left: 9%" mat-raised-button>Update Work Hours</button>
+          <button id="btn" style="margin-left: 9%" [matMenuTriggerFor]="menu" mat-raised-button>Get Statistics</button>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item>PDF</button>
+            <button *ngIf="details.managerView" mat-menu-item>EXCEL</button>
+          </mat-menu>
+          <button id="btn" style="margin-left: 9%" mat-raised-button>Create Task</button>
         </div>
       </div>
     </div>

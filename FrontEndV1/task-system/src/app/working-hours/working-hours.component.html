@@ -1,25 +1,56 @@
 <div id="main">
-    <div id="site_content" style="margin-top: 0px">
-        <div class="content">
-            <h2>Update Working Hours</h2>
-            <form #workingHoursForm="ngForm" id="updateForm" (ngSubmit)="updateTask(workingHoursForm)">
-                <table>
-                    <tr>
-                        <th>Task ID</th>
-                        <th>Date</th>
-                        <th>Working Hours</th>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td><select [(ngModel)]="updateTaskId" name="taskId">
-                                <option *ngFor="let dev of details.items" value="{{dev.taskId}}">{{dev.taskId}}</option>
-                              </select></td>
-                        <td><input matInput type="date" name="date" ngModel></td>
-                        <td><input matInput type="number" name="workedHours" ngModel></td>
-                        <td><button mat-raised-button id="btn" type="submit">Update</button></td>
-                    </tr>
-                </table>
-            </form>
+    <div id="site_content" style="margin-bottom: 20px">
+        <div class="dateContent">
+            <h3>Select a date</h3>
+            <input matInput type="date" [(ngModel)]="date"><br><br>
+            <button mat-raised-button id="btn" (click)="dateSelect(date)">Submit</button>
+        </div>
+        <div class="content1" *ngIf="details.displayTable">
+            <h2>Update Working Hours</h2><br>
+            <table>
+                <tr>
+                    <th>Task ID</th>
+                    <th>Task Name</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Remaining Hours</th>
+                    <th>Working Hours</th>
+                    <th></th>
+                </tr>
+                <tr *ngFor="let dev of details.items; let i=index">
+                    <td>{{dev.taskId}}</td>
+                    <td>{{dev.taskName}}</td>
+                    <td>{{dev.startDate}}</td>
+                    <td>{{dev.endDate}}</td>
+                    <td>{{dev.remainingWork}}</td>
+                    <td><input type="number" name="tempString{{i}}" [(ngModel)]="tempString[i]" ngModel></td>
+                    <td><button mat-raised-button id="btn" (click)="sendWorkHours(dev,tempString[i])" *ngIf="tempString[i]">Update</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="content2" *ngIf="logDetails.displayTable">
+            <h2>Work Hours Log</h2><br>
+            <table>
+                <tr>
+                    <th>Task ID</th>
+                    <th>Task Name</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Remaining Hours</th>
+                    <th>Working Hours</th>
+                    <th></th>
+                </tr>
+                <tr *ngFor="let dev of logDetails.items">
+                    <td>{{dev.taskId}}</td>
+                    <td>{{dev.taskName}}</td>
+                    <td>{{dev.startDate}}</td>
+                    <td>{{dev.endDate}}</td>
+                    <td>{{dev.remainingWork}}</td>
+                    <td>{{dev.workedHours}}</td>
+                    <td><button mat-raised-button id="btn" (click)="deleteLog(dev)">Delete</button></td>
+                </tr>
+            </table>
         </div>
     </div>
     <div id="footer">
