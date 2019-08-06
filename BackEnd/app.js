@@ -641,22 +641,9 @@ MongoClient.connect(url, options, function (err, client) {
 
 
 
-    var getRemainingHours = (eid, tid) => {
-
-        return new Promise((resolve, reject) => {
-            conn
-                .collection('tasks')
-                .find({ $and: [{ employeeId: eid, taskId: tid }] }).project({ remainingWork: 1 })
-                .toArray(function (err, data) {
-                    console.log(data[0])
-                    err
-                        ? reject(err)
-                        : resolve(data[0]);
-
-                });
-        });
-    };
-
+   
+    
+    
 
 
     var updateWorkingHours = async (eid, tid) => {
