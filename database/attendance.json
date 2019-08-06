@@ -1,0 +1,2 @@
+{"_id":{"$oid":"5d3a78a0504e5a1af4b53806"},"employeeId":"nec01","fromDate":{"$date":{"$numberLong":"1564338600000"}},"toDate":{"$date":{"$numberLong":"1564338600000"}},"comment":"reason"}
+{"_id":{"$oid":"5d43bee1dbff7148d0bef23a"},"employeeId":"nec02","fromDate":{"$date":{"$numberLong":"1564617600000"}},"toDate":{"$date":{"$numberLong":"1564617600000"}},"comment":"Reason2"}

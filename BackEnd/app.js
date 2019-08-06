@@ -27,6 +27,7 @@ var assert = require("assert")
 var MongoClient = Promise.promisifyAll(require("mongodb")).MongoClient
 var moment = require("moment")
 var xl = require("excel4node")
+var groupBy = require("json-groupby")
 
 var app = express();
 app.use(body_parser.json())
@@ -401,6 +402,7 @@ MongoClient.connect(url, options, function (err, client) {
         var did = req.params.Did;
         var body = req.body;
         var stdate = body.fromDate;
+        console.log(stdate)
         fromDate = new Date(new Date(stdate).toISOString())
         if (body.toDate !== undefined) {
             var endate = body.toDate
@@ -438,25 +440,27 @@ MongoClient.connect(url, options, function (err, client) {
         conn
             .collection('tasks')
             .find({ $and: [{ employeeId: eid }, { startDate: { $lte: findDate } }, { endDate: { $gte: findDate } }] }).toArray()
-            .then(async function (data) {
+            .then(function (data) {
 
-                for (let i in data) {
-                    var len = data.length
-
-                    logdata = await call(data[i].taskId, eid)
-                    if (logdata.length > 0) {
-
-                        result.push({ "log": logdata })
+                // for (let i in data) {
+                //     console.log("----------------------")
+                //     console.log(data);
+                //     var len = data.length
 
 
-                    }
-                    if (i == (len - 1)) {
-                        res.send(result)
-                    }
+                //     if (logdata.length > 0) {
 
-                }
+                //         result.push({ "log": logdata })
 
 
+                //     }
+                //     if (i == (len - 1)) {
+                //         res.send(result)
+                //     }
+
+                // }
+
+                res.send(data)
             }).catch(err => {
                 console.log(err)
             })
@@ -481,24 +485,31 @@ MongoClient.connect(url, options, function (err, client) {
 
 
         var eid = req.params.did;
-        
+        var body = req.body
 
         findDate = new Date(body.date).toISOString().slice(0, 10);
         var output = []
-
+        fDate = new Date(findDate)
+        console.log(findDate)
         conn
             .collection('workingHours')
-            .find({ $and: [{ employeeId: eid },{date:findDate}] }).toArray()
-            .then(function (data) {
+            .find({ $and: [{ employeeId: eid }, { date: fDate }] }).toArray()
+            .then(async function (data) {
 
                 for (var item of data) {
 
                     var newDate = new Date(item.date).toISOString().slice(0, 10);
-                    if (newDate === findDate)
+                    var task = await taskOfemp(body.taskId);
+                    if (newDate === findDate) {
+                        item.taskName = task.taskName;
+                        item.startDate = task.startDate;
+                        item.endDate = task.endDate;
+
                         output.push(item)
+
+                    }
                 }
                 res.send(output)
-
 
             }).catch(err => {
                 console.log(err)
@@ -507,14 +518,25 @@ MongoClient.connect(url, options, function (err, client) {
 
     })
 
+    var taskOfemp = (tid) => {
+        return new Promise((resolve, reject) => {
+            conn.collection('tasks').find({ taskId: tid }).toArray(function (err, task) {
+                err
+                    ? reject(err)
+                    : resolve(task[0]);
+
+            })
+        })
+
+    }
     app.post("/deleteLog/:did", (req, res) => {
 
         console.log(req.body)
         var eid = req.params.did;
         var body = req.body;
         console.log(eid)
-        console.log(typeof(body.taskId))
-        console.log(typeof(body.workedHours))
+        console.log(typeof (body.taskId))
+        console.log(typeof (body.workedHours))
         deleteDate = new Date(new Date(body.date)).toISOString()
 
 
@@ -653,9 +675,9 @@ MongoClient.connect(url, options, function (err, client) {
         return remaining
     }
 
-    app.get("/getStatistics/:did", (req, res) => {
+    app.get("/getStatistics", (req, res) => {
 
-        var eid = req.params.did;
+
 
         var first = moment().startOf('ISOweek');
         var last = moment().endOf('ISOweek').add(-1, "days");
@@ -676,14 +698,20 @@ MongoClient.connect(url, options, function (err, client) {
         getStatistics(firstday, lastday, prevfirstday, prevlastday, new Date(moment()), nextlastday).then(function (result) {
 
             getAllData().then(function (employeeTasks) {
+                excel2(result).then(function (data) {
+                    workAllocationSummary(data, ws4)
+                    weekLog(result[0].current, employeeTasks, ws1)
+                    weekLog(result[0].previous, employeeTasks, ws2)
+                    weekLog(result[0].next, employeeTasks, ws3)
+                    wb.write('statistics.xlsx', res)
 
-                workAllocationSummary(result, employeeTasks, ws4)
-                weekLog(result[0].current, employeeTasks, ws1)
-                weekLog(result[0].previous, employeeTasks, ws2)
-                weekLog(result[0].next, employeeTasks, ws3)
+                });
 
-                wb.write('statistics.xlsx', res)
+
+
+
             })
+
         })
 
     })
@@ -768,11 +796,9 @@ MongoClient.connect(url, options, function (err, client) {
         }
     }
 
-    var workAllocationSummary = (logdetails, employeeTasks, sheet) => {
-        current = logdetails[0].current;
-        previous = logdetails[0].previous;
-        next = logdetails[0].next;
-        leave = logdetails[0].attendance;
+    var workAllocationSummary = (array, sheet) => {
+
+
 
         var style = wb.createStyle({
             font: {
@@ -798,6 +824,8 @@ MongoClient.connect(url, options, function (err, client) {
         sheet.column(9).setWidth(60)
         sheet.column(3).setWidth(70)
         sheet.column(2).setWidth(20)
+        sheet.column(7).setWidth(60)
+        sheet.column(8).setWidth(60)
         sheet.cell(1, 1).string("Resource").style(style)
         sheet.cell(1, 2).string("Project ID").style(style)
         sheet.cell(1, 3).string("Project Name").style(style)
@@ -817,105 +845,156 @@ MongoClient.connect(url, options, function (err, client) {
             }
         })
 
-        flag = 0;
-        var eobj = [];
-        for (let emp of employeeTasks) {
 
 
-            for (let el of eobj) {
-                emp.projectId = "" + emp.projectId
+        
+        
+        var row = 2
+        for (var item of array) {
+            
+            var col = 1
 
-                if (el.employeeId === emp.employeeId) {
-                    flag = 1;
+            var e = item;
 
-                    el.projectName += "^" + emp.projectName;
-                    el.projectId += "," + emp.projectId;
-                    el.taskId += "," +emp.taskId;
-                }
-                else {
-                    flag = 0;
-                }
+            
+            for (var emp of e) {
+
+                
+                sheet.cell(row, col).string(emp._id.did).style(beauty)
+
+
+                col = 2
+                sheet.cell(row, col).number(emp._id.pid).style(beauty)
+
+                sheet.cell(row, ++col).string(emp.projectName).style(beauty)
+                sheet.cell(row, ++col).number(emp.prevsum).style(beauty)
+                sheet.cell(row, ++col).number(emp.cursum).style(beauty)
+                sheet.cell(row, ++col).number(emp.nextsum).style(beauty)
+                
+                sheet.cell(row, ++col).string(emp.leave[0].fromDate).style(beauty)
+                sheet.cell(row, ++col).string(emp.leave[0].toDate).style(beauty)
+                sheet.cell(row++, ++col).string(emp.leave[0].comment).style(beauty)
+
+
+
             }
-            if (flag === 0) {
-                eobj.push(emp)
-            }
-            console.log(eobj)
+
 
         }
 
-        let row = 2;
 
-        var idarray = [];
-        var prevarray = [];
-        var curarray = [];
-        var nextarray = [];
-        var namesarray = [];
-        for (let emp of eobj) {
-            var IDs = emp.projectId.split(",");
-            var projects = emp.projectName.split("^");
-            var tIDs = emp.taskId.split(",");
-            var col = 1;
-            var curSum = 0
-            var prevSum = 0
-            var nextSum = 0
-            for (var id of tIDs) {
-                if (idarray.includes(id)) {
-                    for (let c of current) {
-                        if (c.employeeId === emp.employeeId && c.taskId === emp.taskId) {
-                            curSum = curSum + c.workedHours;
+    }
+
+
+
+    var dataForExcel = (logdetails) => {
+        current = logdetails[0].current;
+        previous = logdetails[0].previous;
+        next = logdetails[0].next;
+        leave = logdetails[0].attendance;
+        
+        return new Promise((resolve, reject) => {
+            var data;
+            conn.collection('tasks').aggregate([{ $group: { _id: { did: "$employeeId", pid: "$projectId" }, details: { $push: { tid: "$taskId" } } } }]).toArray(function (err, result) {
+                data = result;
+                for (var item of data) {
+                    item.prevsum = 0;
+                    item.nextsum = 0;
+                    item.cursum = 0;
+                    item.leave = []
+                    
+                    for (var t of item.details) {
+                        cursum = 0
+                        for (var c of current) {
+
+
+                            if (c.employeeId === item._id.did && t.tid === c.taskId) {
+                                item.cursum += c.workedHours;
+
+                            }
                         }
+                        prevsum = 0
+                        for (var p of previous) {
+
+
+                            if (p.employeeId === item._id.did && t.tid === p.taskId) {
+                                item.prevsum += p.workedHours;
+
+                            }
+                        }
+                        nextsum = 0
+                        for (var n of next) {
+                            if (n.employeeId === item._id.did && t.tid === n.taskId) {
+                                item.nextsum += n.remainingWork;
+
+                            }
+                        }
+                        var from=""
+                        var to=""
+                        var comment=""
+                        for (var l of leave) {
+                           
+                            if (l.employeeId === item._id.did) {
+                                from =from+"     " + l.fromDate.toISOString().slice(0, 10) ;
+                                to = to+"     " + l.toDate.toISOString().slice(0, 10) ;
+                                comment = comment + ","+l.comment ;
+                               
+                            }
+                            // console.log(item.leave)
+                            
+                        }
+                        item.leave.push({ "fromDate": from, "toDate": to, "comment": comment })
+
                     }
                 }
-                else {
-                    idarray.push(id);
-                }
 
-            }
-            
-           
-            
-            for (let p of previous) {
-                if (p.employeeId === emp.employeeId) {
-                    prevSum = prevSum + p.workedHours;
-                }
-            }
-            
-            for (let n of next) {
-                if (n.employeeId === emp.employeeId) {
-                    nextSum = nextSum + n.remainingWork;
-                }
-            }
-            var from = ""
-            var to = ""
-            var comment = ""
-            for (let l of leave) {
-                if (l.employeeId === emp.employeeId) {
-                    from = l.fromDate.toISOString().slice(0, 10) + from;
-                    to = l.toDate.toISOString().slice(0, 10) + to;
-                    comment = comment + l.comment + "    ";
-                }
-            }
+                err
+                    ? reject(err)
+                    : resolve(data);
 
-            for (let k in IDs) {
+            });
+        });
 
+    }
+
+    var projectsForExcel = () => {
+        return new Promise((resolve, reject) => {
+
+            conn.collection('projects').find().toArray(function (err, result) {
+
+
+                err
+                    ? reject(err)
+                    : resolve(result);
+
+            });
+        });
+
+    }
+
+    var excel2 = async (logdetails) => {
+        var edata = await dataForExcel(logdetails);
+        var pdata = await projectsForExcel();
+        for (var data of edata) {
+            data.projectName = ""
+            for (var pro of pdata) {
+                if (data._id.pid === pro.projectId)
+                    data.projectName = pro.projectName
             }
-            sheet.cell(row, col).string(emp.employeeId).style(beauty)
-            ++col
-            ++col
-            for (let i in IDs) {
-                sheet.cell(row, --col).string(IDs[i]).style(beauty)
-                sheet.cell(row++, ++col).string(projects[i]).style(beauty)
-            }
-            sheet.cell(row, ++col).number(prevSum).style(beauty)
-            sheet.cell(row, ++col).number(curSum).style(beauty)
-            sheet.cell(row, ++col).number(nextSum).style(beauty)
-            sheet.cell(row, ++col).string(from).style(beauty)
-            sheet.cell(row, ++col).string(to).style(beauty)
-            sheet.cell(row, ++col).string(comment).style(beauty)
-            row++;
+        }
+
+        var obj = groupBy(edata, ['_id.did'])
+        var myArray = new Array();
+
+
+        for (var key in obj) {
+            jsonobj = obj[key]
+
+            myArray.push(jsonobj)
 
         }
 
+        return myArray
     }
 
     var currentWeek = (firstday, lastday) => {
@@ -957,6 +1036,7 @@ MongoClient.connect(url, options, function (err, client) {
                 .find({ $and: [{ endDate: { $lte: nextlastday } }, { endDate: { $gte: nextfirstday } }] })
                 .project({ remainingWork: 1, totalWork: 1, endDate: 1, taskId: 1, employeeId: 1 })
                 .toArray(function (err, data) {
+
                     err
                         ? reject(err)
                         : resolve(data);
